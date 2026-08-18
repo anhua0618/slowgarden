@@ -1,0 +1,7 @@
+{
+  "_readme":"开源模板示例存档：可以清空后重新开始，不含真实数据。",
+  "meta":{"day":1},
+  "players":[{"id":"user","name":"玩家","coins":100,"seeds":{},"storage":[],"pantry":{},"drinks":{},"utensils":[],"dishes":[]}],
+  "plots":[{"id":1,"item":null,"planted_day":null,"by":null},{"id":2,"item":null,"planted_day":null,"by":null},{"id":3,"item":null,"planted_day":null,"by":null},{"id":4,"item":null,"planted_day":null,"by":null},{"id":5,"item":null,"planted_day":null,"by":null},{"id":6,"item":null,"planted_day":null,"by":null}],
+  "log":[{"day":1,"actor":"系统","text":"这是一个可以自由修改的开源模板"}]
+}

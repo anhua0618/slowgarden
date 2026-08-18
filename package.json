@@ -1,0 +1,14 @@
+{
+  "name": "garden-kitchen-kit",
+  "version": "0.1.0",
+  "description": "可由玩家与 AI 一起扩展的农场、商店与厨房文件模板",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "validate": "node engine.js",
+    "render": "node render.js",
+    "test": "node test.js",
+    "start": "node render.js"
+  },
+  "engines": { "node": ">=18" }
+}

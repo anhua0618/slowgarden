@@ -1,0 +1,32 @@
+{
+  "_readme": "开源模板文件：这是示例规则，可自由替换、删除或新增，不含任何真实数据。",
+  "meta": {"title":"我的小院子","days_per_season":28,"seasons":["spring","summer","autumn","winter"],"season_names":{"spring":"春","summer":"夏","autumn":"秋","winter":"冬"},"plot_count":6,"start_coins":100},
+  "crops": {
+    "pea":{"name":"豌豆","season":"spring","grow_days":3,"value":15,"seed_price":8},
+    "tomato":{"name":"番茄","season":"summer","grow_days":4,"value":25,"seed_price":11},
+    "corn":{"name":"玉米","season":"summer","grow_days":5,"value":30,"seed_price":14},
+    "sunflower":{"name":"向日葵","season":"summer","grow_days":4,"value":22,"seed_price":10,"flower":true},
+    "pumpkin":{"name":"南瓜","season":"autumn","grow_days":5,"value":35,"seed_price":16},
+    "cabbage":{"name":"卷心菜","season":"autumn","grow_days":4,"value":20,"seed_price":9},
+    "narcissus":{"name":"水仙","season":"winter","grow_days":3,"value":30,"seed_price":14,"flower":true}
+  },
+  "supplies": {
+    "salt":{"name":"盐","price":8,"portions":3},
+    "sugar":{"name":"糖","price":10,"portions":3},
+    "cooking_oil":{"name":"食用油","price":14,"portions":3}
+  },
+  "drinks": {
+    "soda":{"name":"苏打水","price":8,"amount":2},
+    "lemon_tea":{"name":"柠檬茶","price":12,"amount":2}
+  },
+  "utensils": {
+    "plate":{"name":"白瓷盘","price":28},
+    "frying_pan":{"name":"平底锅","price":68},
+    "soup_pot":{"name":"汤锅","price":72}
+  },
+  "recipes": {
+    "pea_saute":{"name":"清炒豌豆","crops":{"pea":2},"supplies":{"salt":1},"utensils":["frying_pan","plate"]},
+    "tomato_salad":{"name":"凉拌番茄","crops":{"tomato":1},"supplies":{"sugar":1},"utensils":["plate"]},
+    "corn_soup":{"name":"玉米浓汤","crops":{"corn":2},"supplies":{"salt":1},"utensils":["soup_pot","plate"]}
+  }
+}
