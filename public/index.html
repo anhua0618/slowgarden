@@ -1,0 +1,92 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>slowgarden</title><style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#3a3a32;background:#f5f1e8}*{box-sizing:border-box}body{margin:0;max-width:900px;margin:auto;padding:16px;padding-bottom:80px}
+header{padding:20px;border-radius:20px;background:linear-gradient(135deg,#dcefe4,#f7dfcc);margin-bottom:14px}
+h1{margin:0 0 6px;font-size:22px}.bar{font-size:13px;color:#6b6558}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fffaf2;border-top:1px solid #e6dcc9;z-index:10}
+nav button{flex:1;border:0;background:none;padding:12px 4px;font:13px inherit;color:#8a8272;cursor:pointer}
+nav button.on{color:#3a7a3a;font-weight:600}
+section{display:none}section.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.plot{aspect-ratio:1;border-radius:12px;border:1.5px dashed #c8b896;background:#efe7d6;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;cursor:pointer;padding:4px;text-align:center}
+.plot.grown{border-style:solid;border-color:#8bc38b;background:#e4f4df}
+.plot .sub{font-size:9px;color:#8a8272;margin-top:3px}
+.card{background:#fffaf2;border:1px solid #ece2d0;border-radius:12px;padding:12px;margin-bottom:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #f0e8d8}
+.row:last-child{border:0}.row .info{flex:1}.row .name{font-size:14px}.row .meta{font-size:11px;color:#8a8272}
+button.act{border:0;border-radius:9px;padding:7px 14px;background:#3a7a3a;color:#fff;font:12px inherit;cursor:pointer}
+button.act.ghost{background:#ece2d0;color:#5a5044}
+h2{font-size:15px;margin:14px 0 8px;color:#5a5044}
+.empty{color:#a49a86;font-size:12px;padding:10px 0}
+#toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#3a3a32;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:50;opacity:0;transition:.3s;pointer-events:none;max-width:90%}
+#toast.show{opacity:.95}
+.seedbtn{display:inline-block;margin:3px;padding:6px 12px;border-radius:10px;border:1.5px solid #c8b896;background:#fff;font-size:12px;cursor:pointer}
+.seedbtn.on{border-color:#3a7a3a;background:#e4f4df}
+.warn{background:#fff3f0;border:1px solid #f0c8bc;color:#a44;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:8px}
+</style></head><body>
+<div id="toast"></div>
+<header><h1 id="title">slowgarden</h1><div class="bar"><span id="barDay"></span> · <span id="barSeason"></span> · <span id="barCoins"></span></div></header>
+<div id="warnBox"></div>
+<section id="farm" class="on"><h2>田地</h2><div class="grid" id="plots"></div><div class="card" id="seedPick" style="margin-top:10px"></div><div style="margin-top:8px"><button class="act ghost" onclick="advance(1)">过一天</button> <button class="act ghost" onclick="advance(3)">过三天</button></div></section>
+<section id="shop"><h2>商店</h2><div id="shopList"></div></section>
+<section id="kitchen"><h2>厨房</h2><div id="recipeList"></div></section>
+<section id="bag"><h2>仓库</h2><div class="card" id="storageBox"></div><h2>调料柜</h2><div class="card" id="pantryBox"></div><h2>饮料柜</h2><div class="card" id="drinkBox"></div><h2>厨具</h2><div class="card" id="utensilBox"></div><h2>做好的菜</h2><div class="card" id="dishBox"></div></section>
+<nav><button class="on" data-tab="farm">农场</button><button data-tab="shop">商店</button><button data-tab="kitchen">厨房</button><button data-tab="bag">背包</button></nav>
+<script>
+var S=null,pickedSeed=null;
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('show');},1800);}
+function api(path,data){return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})}).then(function(r){return r.json();});}
+function ks(o){return Object.keys(o||{}).filter(function(k){return k[0]!=='_';});}
+function load(){return fetch('/api/state').then(function(r){return r.json();}).then(function(d){S=d;render();});}
+function act(p,data){return api(p,data).then(function(r){toast(r.message||(r.ok?'好了':'不行'));return load();});}
+function advance(n){act('/api/advance',{days:n});}
+function buy(id){act('/api/buy',{itemId:id});}
+function sellCrop(id){act('/api/sell',{cropId:id});}
+function cook(id){act('/api/cook',{recipeId:id});}
+function pickSeed(id){pickedSeed=id;render();}
+function plant(pid){if(!pickedSeed){toast('先在下面选一样种子');return;}act('/api/plant',{plotId:pid,cropId:pickedSeed});}
+function harvest(pid){act('/api/harvest',{plotId:pid});}
+function me(){return S.state.players[0];}
+function cropName(id){return (S.catalog.crops[id]||{}).name||id;}
+function render(){
+  var st=S.state, cat=S.catalog, p=me();
+  var seasons=cat.meta.seasons, sName=(cat.meta.season_names||{})[seasons[Math.floor((st.meta.day-1)/cat.meta.days_per_season)%seasons.length]];
+  document.getElementById('title').textContent=cat.meta.title||'slowgarden';
+  document.getElementById('barDay').textContent='第 '+st.meta.day+' 天';
+  document.getElementById('barSeason').textContent=sName+'季';
+  document.getElementById('barCoins').textContent=p.coins+' 金';
+  var wb=document.getElementById('warnBox');
+  wb.innerHTML=(S.validation&&S.validation.length)?'<div class="warn">规则有问题：'+S.validation.join('；')+'</div>':'';
+  var curSeason=seasons[Math.floor((st.meta.day-1)/cat.meta.days_per_season)%seasons.length];
+  document.getElementById('plots').innerHTML=st.plots.map(function(pl){
+    if(!pl.item)return '<div class="plot empty" onclick="plant('+JSON.stringify(pl.id)+')"><b>#'+pl.id+'</b><small>空地·点这里种</small></div>';
+    var c=cat.crops[pl.item]||{}, age=st.meta.day-pl.planted_day, ready=age>=(c.grow_days||1);
+    return '<div class="plot'+(ready?' ready':'')+'"'+(ready?' onclick="harvest('+JSON.stringify(pl.id)+')"':'')+'><b>#'+pl.id+'</b><strong>'+(c.name||pl.item)+'</strong><small>'+(ready?'点这里收':'第 '+age+'/'+(c.grow_days||'?')+' 天')+'</small></div>';
+  }).join('');
+  var seeds=ks(p.seeds).filter(function(k){return p.seeds[k]>0;});
+  document.getElementById('seedPick').innerHTML='<div style="font-size:12px;color:#8a8272;margin-bottom:6px">选一样种子，再点上面的空地：</div>'+(seeds.length?seeds.map(function(k){return '<span class="seedbtn'+(pickedSeed===k?' on':'')+'" onclick="pickSeed('+JSON.stringify(k)+')">'+cropName(k)+' x'+p.seeds[k]+'</span>';}).join(''):'<span class="empty">种子袋空了，去商店买点种子</span>');
+  renderShop(cat,curSeason); renderKitchen(cat,p); renderBag(cat,p);
+}
+function renderShop(cat,curSeason){
+  var rows=[];
+  ks(cat.crops).forEach(function(k){var c=cat.crops[k];if(typeof c.seed_price==='number'){var off=c.season!==curSeason;rows.push({id:'seed_'+k,name:c.name+'种子',meta:c.season+' · '+c.grow_days+'天 · 卖'+c.value+'金',price:c.seed_price,off:off});}});
+  ks(cat.supplies).forEach(function(k){var s=cat.supplies[k];rows.push({id:k,name:s.name,meta:'调料 · 一次'+s.portions+'份',price:s.price});});
+  ks(cat.drinks||{}).forEach(function(k){var d=cat.drinks[k];rows.push({id:k,name:d.name,meta:'饮料 · 一次'+d.amount+'瓶',price:d.price});});
+  ks(cat.utensils).forEach(function(k){var u=cat.utensils[k];rows.push({id:k,name:u.name,meta:'厨具 · 买一次',price:u.price});});
+  document.getElementById('shopList').innerHTML='<div class="card">'+rows.map(function(r){return '<div class="row"><div class="info"><div class="name">'+r.name+'</div><div class="meta">'+r.meta+(r.off?' · 过季':'')+'</div></div><div style="font-size:13px;color:#8a8272">'+r.price+'金</div><button class="act" onclick="buy('+JSON.stringify(r.id)+')">买</button></div>';}).join('')+'</div>';
+}
+function renderKitchen(cat,p){
+  document.getElementById('recipeList').innerHTML='<div class="card">'+ks(cat.recipes).map(function(k){var r=cat.recipes[k];var need=[].concat(ks(r.crops||{}).map(function(x){return cropName(x)+'x'+r.crops[x];}),ks(r.supplies||{}).map(function(x){return (cat.supplies[x]||{}).name+'x'+r.supplies[x];}),(r.utensils||[]).map(function(x){return (cat.utensils[x]||{}).name;})).join('、');return '<div class="row"><div class="info"><div class="name">'+r.name+'</div><div class="meta">'+need+'</div></div><button class="act" onclick="cook('+JSON.stringify(k)+')">做</button></div>';}).join('')+'</div>';
+}
+function renderBag(cat,p){
+  var stor=(p.storage||[]);
+  document.getElementById('storageBox').innerHTML=stor.length?stor.map(function(x){return '<div class="row"><div class="info"><div class="name">'+cropName(x.item)+'</div><div class="meta">x'+x.count+' · 单价'+((cat.crops[x.item]||{}).value||0)+'金</div></div><button class="act ghost" onclick="sellCrop('+JSON.stringify(x.item)+')">卖一个</button></div>';}).join(''):'<div class="empty">仓库空的</div>';
+  function box(obj,nameFn){var k=ks(obj).filter(function(x){return obj[x]>0;});return k.length?k.map(function(x){return '<div class="row"><div class="info"><div class="name">'+nameFn(x)+'</div><div class="meta">x'+obj[x]+'</div></div></div>';}).join(''):'<div class="empty">空</div>';}
+  document.getElementById('pantryBox').innerHTML=box(p.pantry,function(x){return (cat.supplies[x]||{}).name||x;});
+  document.getElementById('drinkBox').innerHTML=box(p.drinks,function(x){return (cat.drinks[x]||{}).name||x;});
+  document.getElementById('utensilBox').innerHTML=(p.utensils||[]).length?p.utensils.map(function(x){return '<div class="row"><div class="name">'+((cat.utensils[x]||{}).name||x)+'</div></div>';}).join(''):'<div class="empty">空</div>';
+  var dishes=(p.dishes||[]);
+  document.getElementById('dishBox').innerHTML=dishes.length?dishes.map(function(x){return '<div class="row"><div class="name">'+((cat.recipes[x.item]||{}).name||x.item)+'</div><div class="meta">x'+x.count+'</div></div>';}).join(''):'<div class="empty">还没做菜</div>';
+}
+document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){var t=b.getAttribute('data-tab');document.querySelectorAll('nav button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');document.querySelectorAll('section').forEach(function(s){s.classList.toggle('on',s.id===t);});};});
+load();
+</script></body></html>

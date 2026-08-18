@@ -8,7 +8,9 @@
     "validate": "node engine.js",
     "render": "node render.js",
     "test": "node test.js",
-    "start": "node render.js"
+    "start": "node server.js"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

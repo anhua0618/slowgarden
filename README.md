@@ -13,7 +13,7 @@ slowgarden 是一套**纯本地、文件驱动**的农场 × 商店 × 厨房框
 - 在商店购买调料、饮料和厨具
 - 按菜谱检查材料、消耗库存并做出料理
 - 用 `catalog.json` 自由添加作物、商品、厨具和菜谱
-- 把当前院子生成成静态 HTML 页面，随时用浏览器查看
+- 启动本地服务，在网页上直接买、种、收、卖、做饭，AI 读写同一份存档
 - 用自动测试检查基础逻辑，避免改完规则后悄悄坏掉
 
 种子商品会直接从作物规则生成，不需要再维护第二张商品表。想加一种作物，只要在一个地方写一次。
@@ -37,17 +37,17 @@ cd slowgarden
 # 检查项目
 npm test
 
-# 使用示例存档生成页面
-npm run render
+# 启动本地服务
+npm start
 ```
 
-然后用浏览器打开 `index.html`。
+然后用浏览器打开 http://localhost:3000 ，就能在页面上操作这个院子。
 
 如果想重新建立一份空白存档：
 
 ```bash
 node init.js --force
-node render.js
+npm start
 ```
 
 > `--force` 会重置现有的 `state.json`，已有进度请先备份。
@@ -63,7 +63,7 @@ node render.js
 
 ```bash
 npm test
-npm run render
+npm start
 ```
 
 之后你可以直接对它说：
@@ -83,8 +83,10 @@ AI 负责读写文件和执行规则，你负责决定这个院子要长成什�
 | `catalog.json` | 作物、种子价格、调料、饮料、厨具和菜谱 |
 | `state.json` | 当前日期、金币、地块、库存和日志 |
 | `engine.js` | 买、种、收、卖、做饭和推进时间的核心逻辑 |
-| `render.js` | 读取规则与存档，生成 `index.html` |
-| `index.html` | 当前院子的静态预览页 |
+| `server.js` | 本地服务：把引擎包成网页可调用的接口 |
+| `public/index.html` | 人类操作的交互页面（农场·商店·厨房·背包） |
+| `render.js` | 读取规则与存档，生成静态预览 `index.html`（可选） |
+
 | `init.js` | 初始化或重置本地存档 |
 | `test.js` | 基础逻辑的自动测试 |
 | `使用说明.md` | 写给普通使用者的中文上手说明 |
