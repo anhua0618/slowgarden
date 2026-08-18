@@ -139,3 +139,18 @@ slowgarden 则把农场、商店和厨房的基本逻辑抽成了一套更轻、
 ---
 
 MIT License
+
+## 想双击就能玩？（单文件版待补）
+
+当前仓库有两种玩法：AI 直接读写 `state.json`，或运行 `npm start` 起本地服务、在网页上操作。两者都需要装 Node.js。
+
+如果你想要一个**双击即玩、连 Node 都不用装**的单文件版，思路是把 `engine.js` 的逻辑和 `public/index.html` 的界面合并进一个 `slowgarden.html`：
+
+- 所有作物、菜谱、商品规则以 JS 对象内联在页面里
+- 存档改用浏览器 `localStorage`，关闭再打开也还在
+- 加「导出存档 / 导入存档」按钮，导出的 JSON 交给 AI，AI 读后可改内容或生成新版 HTML
+- 可选支持 Chrome / Edge 的文件读写权限，让玩家手动选择 `state.json` 直接保存
+
+这样人类双击 HTML 就能玩，AI 通过导入导出的 JSON 参与，不需要服务器、不需要命令行。
+
+这一版还没做完，欢迎自行实现或提 PR。
