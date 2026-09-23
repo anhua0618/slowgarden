@@ -147,16 +147,27 @@ textarea#io{width:100%;height:160px;border:1px solid var(--line);border-radius:1
   </div>
   <div class="card" id="tgLog"></div>
 </section>
+<section id="ai">
+  <h2>和 AI 一起</h2>
+  <div class="card" style="padding:12px 14px">
+    <div class="meta" style="margin-bottom:8px">你的 AI 是院子里的第二个玩家，有自己的金币、种子和仓库。<br>① 点「写给 AI」，把院子今天的样子复制给它；② 它会回你几句话，里面带着 / 开头的动作；③ 把它的回复整段贴到下面，点「让它动手」。</div>
+    <div class="btns" style="margin-bottom:8px"><input class="note" id="aiName" placeholder="给你的 AI 起个名字" maxlength="12" style="flex:1"><button class="act ghost" id="aiNameGo">好了</button></div>
+    <div class="btns"><button class="act" id="aiLetterGo">写给 AI</button></div>
+    <textarea id="aiBox" style="width:100%;min-height:110px;box-sizing:border-box" spellcheck="false" placeholder="把 AI 的回复贴在这里"></textarea>
+    <div class="btns"><button class="act" id="aiRunGo">让它动手</button><button class="act ghost" onclick="document.getElementById('aiBox').value=''">清空</button></div>
+  </div>
+  <div class="card" id="aiSaid"></div>
+</section>
 <section id="save">
   <h2>存 档</h2>
   <div class="card" style="padding:12px 14px">
-    <div class="meta" style="margin-bottom:8px">存档自动保存在这个浏览器里。想让 AI 看看或者帮你改，就「导出」复制给它；它改完把新的 JSON 贴回来点「导入」。</div>
+    <div class="meta" style="margin-bottom:8px">存档自动保存在这个浏览器里。换手机、换浏览器前记得「导出」或「下载成文件」留一份。平时和 AI 一起玩去「AI」那页。</div>
     <textarea id="io" spellcheck="false"></textarea>
     <div class="btns"><button class="act" onclick="exportSave()">导出</button><button class="act ghost" onclick="importSave()">导入</button><button class="act ghost" onclick="downloadSave()">下载成文件</button><button class="act ghost" onclick="resetSave()">重新开始</button></div>
   </div>
 </section>
 </div>
-<nav><button class="on" data-tab="farmPage">农场</button><button data-tab="shopPage">商店</button><button data-tab="kitchenPage">厨房</button><button data-tab="bag">背包</button><button data-tab="together">一起</button><button data-tab="save">存档</button></nav>
+<nav><button class="on" data-tab="farmPage">农场</button><button data-tab="shopPage">商店</button><button data-tab="kitchenPage">厨房</button><button data-tab="bag">背包</button><button data-tab="together">一起</button><button data-tab="ai">AI</button><button data-tab="save">存档</button></nav>
 
 <script>
 /* ===== 规则（由 tools/build-single.js 从 catalog.json 和 state.json 生成，改规则请改那两个文件再重新生成）===== */
@@ -297,12 +308,12 @@ var G = {
     // 每次购买都开一张小票（我们自己家踩过：有的购买路径忘了开票，后来补上的）
     state.receipts = state.receipts || []; state.receipts.push({ day: state.meta.day, who: p.name, item: item.name, price: item.price, balance: p.coins }); state.receipts = state.receipts.slice(-100);
     log(p.name, '买了 ' + item.name); return done(res(true, '买下 ' + item.name + '，花了 ' + item.price + ' 金')); },
-  plant: function(plotId){ var p = me(), pl = state.plots.find(function(x){ return String(x.id) === String(plotId); }), c = CATALOG.crops[picked];
-    if (!picked) return done(res(false, '先在下面选一样种子'));
+  plant: function(plotId, crop){ var p = me(), ck = crop || picked, pl = state.plots.find(function(x){ return String(x.id) === String(plotId); }), c = CATALOG.crops[ck];
+    if (!ck || !c) return done(res(false, '先在下面选一样种子'));
     if (!pl || pl.item) return done(res(false, '这块地种不了'));
     if (c.season !== seasonOf(state.meta.day)) return done(res(false, '现在不是' + c.name + '的季节'));
-    if ((p.seeds[picked] || 0) < 1) return done(res(false, '没有这种种子了'));
-    p.seeds[picked]--; pl.item = picked; pl.planted_day = state.meta.day; pl.by = p.id; log(p.name, '种下 ' + c.name); return done(res(true, '种下了 ' + c.name)); },
+    if ((p.seeds[ck] || 0) < 1) return done(res(false, '没有这种种子了'));
+    p.seeds[ck]--; pl.item = ck; pl.planted_day = state.meta.day; pl.by = p.id; log(p.name, '种下 ' + c.name); return done(res(true, '种下了 ' + c.name)); },
   harvest: function(plotId){ var pl = state.plots.find(function(x){ return String(x.id) === String(plotId); });
     if (!pl || !pl.item) return done(res(false, '地是空的'));
     var c = CATALOG.crops[pl.item], age = state.meta.day - pl.planted_day;
@@ -320,7 +331,8 @@ var G = {
     add(p.dishes, recipeId, 1); log(p.name, '做了 ' + r.name); return done(res(true, '做好了 ' + r.name)); },
   advance: function(n){ state.meta.day += n; return done(res(true, '过了 ' + n + ' 天')); }
 };
-function me(){ return state.players[0]; }
+var ACT = null; // AI 动手时临时换成 AI 那个玩家
+function me(){ return ACT || state.players[0]; }
 function done(r){ save(); toast(r.message); render(); return r; }
 function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 1800); }
 function cropName(id){ return (CATALOG.crops[id] || {}).name || id; }
@@ -329,7 +341,7 @@ var picked = null;
 
 /* ===== 界面 ===== */
 function render(){
-  var m = CATALOG.meta, p = me(), cur = seasonOf(state.meta.day);
+  var m = CATALOG.meta, p = state.players[0], cur = seasonOf(state.meta.day);
   document.getElementById('title').textContent = m.title || 'slowgarden';
   document.getElementById('barDay').textContent = '第 ' + state.meta.day + ' 天';
   document.getElementById('barSeason').textContent = (m.season_names || {})[cur] + '季';
@@ -363,7 +375,7 @@ function render(){
   document.getElementById('drinkBox').innerHTML = box(p.drinks, function(x){ return ((CATALOG.drinks || {})[x] || {}).name || x; });
   document.getElementById('utensilBox').innerHTML = (p.utensils || []).length ? p.utensils.map(function(x){ return '<div class="row"><div class="name">' + esc((CATALOG.utensils[x] || {}).name || x) + '</div></div>'; }).join('') : '<div class="empty">空</div>';
   document.getElementById('dishBox').innerHTML = (p.dishes || []).length ? p.dishes.map(function(x){ return '<div class="row"><div class="name">' + esc((CATALOG.recipes[x.item] || {}).name || x.item) + '</div><span class="meta">×' + x.count + '</span></div>'; }).join('') : '<div class="empty">还没做菜</div>';
-  renderTogether();
+  renderTogether(); renderAI();
 }
 
 /* ===== 一起：陪伴计时（来自安与霁家里的「一起」房间）。结束时每个玩家都拿金币——两个人一起待着，两个人都有份 ===== */
@@ -392,6 +404,67 @@ document.getElementById('tgGo').onclick = function(){
   if (state.together) return stopTogether();
   state.together = { what: (document.getElementById('tgNote').value || '').trim() || tgWhat, minutes: +document.getElementById('tgMins').value, start: Date.now() };
   save(); renderTogether(); };
+
+/* ===== 和 AI 一起：AI 是第二个玩家。写一封信给它，它回话里用 / 开头的行下动作 ===== */
+function aiPlayer(){ return state.players.find(function(x){ return x.id === 'ai'; }); }
+function ensureAI(name){ var a = aiPlayer();
+  if (!a) { a = { id: 'ai', name: name || 'AI', coins: CATALOG.meta.start_coins || 100, seeds: {}, storage: [], pantry: {}, drinks: {}, utensils: [], dishes: [] }; state.players.push(a); }
+  else if (name) a.name = name;
+  return a; }
+function findId(group, word){ word = String(word || '').trim(); var hit = null;
+  ks(group).forEach(function(k){ if (k === word || group[k].name === word) hit = k; }); return hit; }
+function listStr(arr, nm){ return (arr || []).length ? arr.map(function(x){ return nm(x.item) + '×' + x.count; }).join('、') : '没有'; }
+function objStr(o, nm){ var k = ks(o).filter(function(x){ return o[x] > 0; }); return k.length ? k.map(function(x){ return nm(x) + '×' + o[x]; }).join('、') : '没有'; }
+function aiLetter(){ var a = ensureAI(), u = state.players[0], m = CATALOG.meta, cur = seasonOf(state.meta.day), sn = m.season_names || {};
+  var sup = function(x){ return (CATALOG.supplies[x] || {}).name || x; };
+  var L = [];
+  L.push('我们在玩一个叫 slowgarden 的种田小游戏，你是院子里的另一个玩家「' + a.name + '」，我是「' + u.name + '」。');
+  L.push('今天是第 ' + state.meta.day + ' 天，' + (sn[cur] || cur) + '季（每季 ' + m.days_per_season + ' 天，只有当季的种子能种）。');
+  L.push('');
+  L.push('【地】' + state.plots.map(function(pl){ if (!pl.item) return pl.id + '号空着'; var c = CATALOG.crops[pl.item] || {}, age = state.meta.day - pl.planted_day, who = (player(pl.by) || {}).name || '';
+    return pl.id + '号' + (c.name || pl.item) + (age >= c.grow_days ? '（能收了）' : '（' + age + '/' + c.grow_days + '天）') + (who ? '·' + who + '种的' : ''); }).join('；'));
+  L.push('【你】' + a.coins + ' 金；种子：' + objStr(a.seeds, cropName) + '；仓库：' + listStr(a.storage, cropName) + '；调料：' + objStr(a.pantry, sup) + '；厨具：' + ((a.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name || x; }).join('、') || '没有'));
+  L.push('【我】' + u.coins + ' 金；仓库：' + listStr(u.storage, cropName));
+  L.push('【当季种子】' + ks(CATALOG.crops).filter(function(k){ return CATALOG.crops[k].season === cur; }).map(function(k){ var c = CATALOG.crops[k]; return c.name + '种子 ' + c.seed_price + '金（' + c.grow_days + '天熟，卖' + c.value + '）'; }).join('、'));
+  L.push('【杂货】' + ks(CATALOG.supplies).map(function(k){ return CATALOG.supplies[k].name + ' ' + CATALOG.supplies[k].price + '金'; }).concat(ks(CATALOG.utensils).map(function(k){ return CATALOG.utensils[k].name + ' ' + CATALOG.utensils[k].price + '金'; })).join('、'));
+  L.push('【菜谱】' + ks(CATALOG.recipes).map(function(k){ var r = CATALOG.recipes[k];
+    return r.name + '（' + [].concat(ks(r.crops).map(function(x){ return cropName(x) + '×' + r.crops[x]; }), ks(r.supplies).map(function(x){ return sup(x) + '×' + r.supplies[x]; }), (r.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name; })).join('、') + '）'; }).join('；'));
+  var lg = (state.log || []).slice(-6); if (lg.length) L.push('【最近】' + lg.map(function(x){ return '第' + x.day + '天 ' + x.actor + ' ' + x.text; }).join('；'));
+  L.push('');
+  L.push('你想说什么就直接说，想做什么就单独起一行、用 / 开头写动作（可以写好几行）：');
+  L.push('/买 番茄种子 2　　/种 番茄 3（3 是地的编号）　　/收 3　　/卖 番茄 1　　/做 菜名　　/送 番茄 1（送给我）');
+  L.push('过天由我来点。钱和东西是你自己的，怎么花你决定。');
+  return L.join('\n'); }
+function aiRun(text){ var a = ensureAI(), out = [], said = [];
+  ACT = a;
+  try { String(text || '').split(/\n/).forEach(function(line){ var t = line.trim(); if (!t) return;
+    if (!/^[\/／]/.test(t)) { said.push(t); return; }
+    var w = t.replace(/^[\/／]\s*/, '').split(/\s+/), cmd = w[0], x = w[1], n = Math.max(1, Math.min(20, parseInt(w[2], 10) || 1)), r;
+    var one = function(f){ var ok = 0; for (var i = 0; i < n; i++) { r = f(); if (!r.ok) break; ok++; } out.push(t + ' → ' + r.message + (ok > 1 ? '（共 ' + ok + ' 次）' : '')); };
+    if (cmd === '买') { var id = findId(CATALOG.supplies, x) || findId(CATALOG.utensils, x) || findId(CATALOG.drinks || {}, x), cid = findId(CATALOG.crops, String(x || '').replace(/种子$/, ''));
+      if (!id && cid) id = 'seed_' + cid; if (!id) return out.push(t + ' → 货架上没有「' + x + '」'); one(function(){ return G.buy(id); }); }
+    else if (cmd === '种') { var c = findId(CATALOG.crops, x); if (!c) return out.push(t + ' → 不认识「' + x + '」'); r = G.plant(w[2], c); out.push(t + ' → ' + r.message); }
+    else if (cmd === '收') { r = G.harvest(x); out.push(t + ' → ' + r.message); }
+    else if (cmd === '卖') { var s = findId(CATALOG.crops, x); if (!s) return out.push(t + ' → 不认识「' + x + '」'); one(function(){ return G.sell(s); }); }
+    else if (cmd === '做') { var k = findId(CATALOG.recipes, x); if (!k) return out.push(t + ' → 没有这道菜'); r = G.cook(k); out.push(t + ' → ' + r.message); }
+    else if (cmd === '送') { var g = findId(CATALOG.crops, x); if (!g) return out.push(t + ' → 不认识「' + x + '」');
+      var have = count(a.storage, g), k2 = Math.min(have, n); if (k2 < 1) return out.push(t + ' → 仓库里没有');
+      add(a.storage, g, -k2); add(state.players[0].storage, g, k2); log(a.name, '送了 ' + cropName(g) + '×' + k2 + ' 给 ' + state.players[0].name); out.push(t + ' → 送出 ' + cropName(g) + '×' + k2); }
+    else out.push(t + ' → 看不懂这个动作'); }); }
+  finally { ACT = null; }
+  if (said.length) { state.ai_said = { day: state.meta.day, text: said.join('\n').slice(0, 600) }; log(a.name, '说了话'); }
+  state.ai_last = out; done(res(true, out.length ? a.name + ' 做了 ' + out.length + ' 件事' : a.name + ' 说完了')); }
+function renderAI(){ var a = aiPlayer(), el = document.getElementById('aiSaid'); if (!el) return;
+  document.getElementById('aiName').value = a ? a.name : '';
+  var h = '';
+  if (state.ai_said) h += '<div class="row"><div class="info"><div class="name">' + esc(a ? a.name : 'AI') + ' 说</div><div class="meta" style="white-space:pre-wrap">' + esc(state.ai_said.text) + '</div></div></div>';
+  (state.ai_last || []).forEach(function(x){ h += '<div class="row"><div class="meta">' + esc(x) + '</div></div>'; });
+  el.innerHTML = h || '<div class="empty">' + (a ? a.name + ' 还没来过。点「写给 AI」叫它' : '先给你的 AI 起个名字吧') + '</div>'; }
+document.getElementById('aiNameGo').onclick = function(){ var n = document.getElementById('aiName').value.trim(); ensureAI(n); done(res(true, (n || 'AI') + ' 住进院子了')); };
+document.getElementById('aiLetterGo').onclick = function(){ var t = aiLetter(); save(); document.getElementById('aiBox').value = t;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ toast('复制好了，发给你的 AI'); }, function(){ document.getElementById('aiBox').select(); toast('框里这段全选复制，发给你的 AI'); }); render(); };
+document.getElementById('aiRunGo').onclick = function(){ var t = document.getElementById('aiBox').value; if (!t.trim()) return toast('先把 AI 的回复贴进来');
+  if (/^我们在玩一个叫 slowgarden/.test(t.trim())) return toast('这是写给 AI 的信，要贴它回你的话'); aiRun(t); document.getElementById('aiBox').value = ''; };
 
 /* ===== 存档：导出 / 导入 ===== */
 function exportSave(){ document.getElementById('io').value = JSON.stringify(state, null, 2); toast('已经放进下面的框里，全选复制给 AI 就行'); }
