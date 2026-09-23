@@ -142,6 +142,8 @@ MIT License
 
 ## 双击就能玩：单文件版 `slowgarden.html`
 
+**手机直接玩：https://anhua0618.github.io/slowgarden/slowgarden.html**（小白教程见 [教程.md](教程.md)）
+
 不想装 Node？直接双击仓库里的 **`slowgarden.html`**，用浏览器打开就能玩，手机也行。
 
 - 规则和 `engine.js` 是同一套：买种子、按季节种、等几天收、卖钱、做菜
