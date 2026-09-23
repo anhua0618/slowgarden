@@ -7,10 +7,11 @@
 <style>
 /* 单文件版：双击就能玩，存档放在浏览器里，也能导出给 AI 看。
    样式照「素」的方向：浅纸色、细线、圆角，不要渐变。改颜色只动 :root 这几行 */
-:root{--paper:#faf8f3;--base:#f1ede4;--line:#e2dccf;--ink:#3f423b;--muted:#8b867a;--accent:#5f7a5a;--soft:#e7eee2}
+:root{--paper:#f8f5ed;--base:#eee9df;--line:#d8d0c2;--ink:#41443d;--muted:#888276;--accent:#6f7c62;--soft:#e8e2d7}
 *{box-sizing:border-box}
 body{margin:0;background:var(--base);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Segoe UI",sans-serif;font-size:14px}
 .wrap{max-width:520px;margin:0 auto;padding:18px 16px 90px}
+#farmPage.on,#shopPage.on,#kitchenPage.on{display:block}
 header{padding:18px 18px 14px;border:1px solid var(--line);border-radius:18px;background:var(--paper);margin-bottom:14px}
 h1{margin:0 0 6px;font-size:20px;font-weight:500;letter-spacing:2px}
 .bar{font-size:12px;color:var(--muted);letter-spacing:1px}
@@ -44,6 +45,67 @@ button.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
 .chips button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 input.note,select.mins{border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff;font:14px inherit;text-align:center}
 textarea#io{width:100%;height:160px;border:1px solid var(--line);border-radius:12px;padding:10px;font:12px ui-monospace,monospace;background:#fff}
+/* ===== 以下样式来自安和霁家里的农场/厨房（Sol 画的纸本手帐风），原样搬过来 ===== */
+:root{--journal-paper:#f8f5ed;--journal-base:#eee9df;--journal-soft:#e8e2d7;--journal-line:#d8d0c2;--journal-ink:#41443d;--journal-muted:#888276;--card:#f8f5ed;--border:#d8d0c2;--sub:#888276}
+.farm-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.kitchen-card .k-name{font-size:13px;margin-bottom:3px}.kitchen-card .k-meta{font-size:10px;color:#8c897f;line-height:1.6;flex:1}
+.kitchen-action{margin-top:8px;border:0;padding:7px 10px;font:12px inherit;cursor:pointer}
+.kitchen-wrap{padding:16px 20px 28px;max-width:560px;margin:0 auto;}
+.kitchen-scene{height:142px;border-radius:18px;background:linear-gradient(180deg,#ebe6dd 0 62%,#c9b69e 62% 66%,#e1d5c4 66%);position:relative;overflow:hidden;border:1px solid var(--border);margin-bottom:14px;}
+.kitchen-window{position:absolute;left:20px;top:18px;width:82px;height:58px;border:6px solid #f7f4ed;background:linear-gradient(#b9d2dc,#e8e2cf);box-shadow:0 3px 8px rgba(44,44,44,.08);}
+.kitchen-window:after{content:'';position:absolute;background:#f7f4ed;}
+.kitchen-window:before{width:5px;height:100%;left:33px;top:0}
+.kitchen-window:after{height:5px;width:100%;left:0;top:24px}
+.kitchen-shelf{position:absolute;right:18px;top:25px;width:112px;height:7px;background:#856d58;border-radius:3px;box-shadow:0 34px #856d58;}
+.kitchen-jar{position:absolute;top:-20px;width:18px;height:19px;border:2px solid rgba(255,255,255,.8);background:#c8a879;border-radius:3px 3px 6px 6px;}
+.kitchen-jar.j1{left:9px}
+.kitchen-jar.j2{left:39px;background:#b9a5a0}
+.kitchen-jar.j3{left:69px;background:#9cae91}
+.kitchen-pot{position:absolute;right:45px;bottom:21px;width:52px;height:30px;border:4px solid #6c7476;border-radius:4px 4px 16px 16px;background:#aab1b0;}
+.kitchen-pot:before{content:'';position:absolute;width:34px;height:5px;border-radius:5px;background:#666;left:5px;top:-12px;}
+.kitchen-pot:after{content:'';position:absolute;width:24px;height:5px;background:#6c7476;right:-25px;top:5px;border-radius:0 4px 4px 0;}
+.kitchen-caption{position:absolute;left:18px;bottom:14px;font-size:11px;letter-spacing:2px;color:#665b50;}
+.kitchen-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.kitchen-tab{border:1px solid var(--border);background:var(--card);padding:10px;border-radius:12px;color:var(--sub);font:12px inherit;letter-spacing:1px;}
+.kitchen-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.kitchen-summary{font-size:11px;color:var(--sub);line-height:1.8;padding:10px 12px;background:rgba(255,255,255,.42);border-radius:12px;margin-bottom:12px;white-space:pre-line;}
+.kitchen-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.kitchen-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;min-height:130px;display:flex;flex-direction:column;box-shadow:0 5px 18px rgba(58,50,42,.04);}
+.kitchen-icon{height:42px;margin-bottom:9px;position:relative;}
+.kitchen-icon.seed:before{content:'';position:absolute;left:8px;top:4px;width:28px;height:34px;background:#d8c09b;border-radius:5px 5px 9px 9px;transform:rotate(-3deg);box-shadow:inset 0 -8px rgba(130,100,65,.08);}
+.kitchen-icon.seed:after{content:'';position:absolute;left:20px;top:13px;width:7px;height:15px;border-radius:100% 0 100% 0;background:#6f8a68;transform:rotate(-30deg);}
+.kitchen-icon.ingredient:before{content:'';position:absolute;left:10px;top:5px;width:24px;height:34px;border:2px solid #a88f75;border-radius:5px 5px 9px 9px;background:rgba(255,255,255,.55);}
+.kitchen-icon.ingredient:after{content:'';position:absolute;left:13px;top:2px;width:22px;height:7px;border-radius:3px;background:#7b6e60;}
+.kitchen-icon.utensil:before{content:'';position:absolute;left:7px;top:7px;width:31px;height:24px;border:3px solid #7d8586;border-radius:4px 4px 14px 14px;background:#b7bdbc;}
+.kitchen-icon.utensil:after{content:'';position:absolute;left:38px;top:15px;width:22px;height:5px;background:#7d8586;border-radius:4px;}
+.kitchen-icon.dish:before{content:'';position:absolute;left:6px;top:13px;width:52px;height:20px;border:3px solid #c7b8a7;border-radius:50%;background:#f5f0e8;}
+.kitchen-icon.dish:after{content:'';position:absolute;left:20px;top:10px;width:25px;height:17px;border-radius:50%;background:#c98f72;box-shadow:7px 1px #d6b26f;}
+.kitchen-name{font-size:13px;color:var(--ink);margin-bottom:4px;}
+.kitchen-note{font-size:10px;color:var(--sub);line-height:1.5;flex:1;}
+.kitchen-action{margin-top:10px;border:0;border-radius:9px;padding:8px;background:rgba(58,90,107,.1);color:var(--accent);font:11px inherit;}
+.kitchen-action:active{background:var(--accent);color:#fff;}
+.kitchen-empty{text-align:center;padding:36px 10px;color:var(--sub);font-size:12px;grid-column:1/-1;}
+.kitchen-tab{border-radius:0!important;border:1px solid #858b78!important;background:transparent!important;color:#69705f!important;letter-spacing:1px;}
+.kitchen-tab.active{background:#7b816f!important;color:#fff!important;}
+.kitchen-grid{gap:10px;}
+#farmPage{background:#eee9df;color:#41443d;min-height:100vh}
+#farmPage:before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.32;background:repeating-linear-gradient(0deg,rgba(83,76,64,.025) 0 1px,transparent 1px 4px)}
+.farm-journal{max-width:620px;margin:auto;padding:16px 16px 92px}.farm-sheet{position:relative;background:#f8f5ed;border:1px solid #d8d0c2;box-shadow:0 10px 28px rgba(68,59,45,.08);padding:25px 18px 28px;overflow:hidden}.farm-sheet:before{content:'';position:absolute;top:8px;right:34px;width:76px;height:21px;background:rgba(191,181,151,.38);transform:rotate(2deg)}.farm-heading{padding:10px 0 15px;border-bottom:1px solid #cfc7b8;margin-bottom:17px}.farm-heading small{font-size:9px;letter-spacing:2.3px;color:#918b7e}.farm-heading h2{font:400 25px Georgia,'Noto Serif SC',serif;letter-spacing:4px;margin:5px 0}.farm-heading p{font-size:10px;color:#888276;letter-spacing:.5px}.farm-meta{display:flex;justify-content:space-between;margin-bottom:14px;font:10px Georgia,serif;color:#74786b;letter-spacing:1px}.farm-grid{max-width:none!important;gap:9px!important;margin-bottom:20px!important}.farm-plot{aspect-ratio:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:7px 4px;background:#e7dfd1;border:1px solid #cfc4b3;overflow:hidden;color:#4c5048;cursor:default}.farm-plot:before{content:'';position:absolute;left:8px;right:8px;bottom:7px;height:31%;background:repeating-linear-gradient(165deg,#92785e 0 3px,#80694f 3px 6px);border-radius:50% 50% 10% 10%}.farm-plot.empty{cursor:pointer;background:#eee8dc}.farm-plot.empty:after{content:'＋';position:absolute;top:25%;font:22px Georgia;color:#a69b8a}.farm-plot.empty .plot-name{color:#918a7e}.plant-art{position:absolute;left:50%;bottom:29%;width:38px;height:49px;transform:translateX(-50%);z-index:1}.plant-stem{position:absolute;left:18px;bottom:0;width:2px;height:34px;background:#6f7c62}.plant-leaf{position:absolute;width:18px;height:10px;background:#829276;border-radius:100% 0 100% 0}.plant-leaf.l1{left:1px;bottom:16px;transform:rotate(18deg)}.plant-leaf.l2{right:0;bottom:23px;transform:scaleX(-1) rotate(15deg)}.plant-leaf.l3{left:3px;bottom:29px;transform:rotate(26deg) scale(.82)}.plant-bloom{display:none;position:absolute;left:10px;top:0;width:20px;height:20px}.plant-bloom i{position:absolute;left:7px;top:0;width:7px;height:13px;background:#c8ab9f;border-radius:80% 20% 70% 30%;transform-origin:50% 100%}.plant-bloom i:nth-child(2){transform:rotate(72deg)}.plant-bloom i:nth-child(3){transform:rotate(144deg)}.plant-bloom i:nth-child(4){transform:rotate(216deg)}.plant-bloom i:nth-child(5){transform:rotate(288deg)}.plant-bloom:after{content:'';position:absolute;left:7px;top:7px;width:7px;height:7px;border-radius:50%;background:#b49a66}.farm-plot.mature{cursor:pointer;border-color:#9ca68e;background:#ebe9dd;box-shadow:inset 0 0 0 2px rgba(127,139,115,.12)}.farm-plot.mature .plant-stem{height:38px}.farm-plot.mature .plant-bloom{display:block}.plot-copy{position:relative;z-index:2;text-align:center;width:100%;margin-top:auto;background:linear-gradient(transparent,rgba(248,245,237,.92) 28%);padding-top:12px}.plot-name{font-size:10px;letter-spacing:.5px}.plot-status{font-size:8px;color:#8c897f;margin-top:2px}.farm-plot.mature .plot-status{color:#707963}.seed-panel{background:#eee9df;border:1px solid #d8d0c2;padding:13px}.seed-title{font-size:9px;color:#888276;letter-spacing:2px;margin-bottom:10px}.seed-picker{display:flex;flex-wrap:wrap;gap:7px}.seed-choice{cursor:pointer;padding:8px 11px;border:1px solid #c9c1b4;background:#f8f5ed;color:#55584f;font-size:11px}.seed-choice.on{background:#7e8673;border-color:#7e8673;color:#fff}.seed-choice span{font:9px Georgia,serif;opacity:.72;margin-left:4px}.farm-stamp{display:inline-block;margin-top:20px;border:1px solid rgba(128,139,115,.5);color:#7c866f;padding:5px 10px;font-size:9px;letter-spacing:2px;transform:rotate(-2deg)}
+@media(max-width:380px){.farm-journal{padding:11px 10px 86px}.farm-sheet{padding-left:13px;padding-right:13px}.farm-grid{gap:6px!important}.plant-art{transform:translateX(-50%) scale(.88)}}
+/* Species keep botanical colors; these do not follow journal theme colors. */
+.farm-plot{--petal:#c8ab9f;--center:#b49a66;--leaf:#829276;--stem:#6f7c62}.farm-plot .plant-stem{background:var(--stem)}.farm-plot .plant-leaf{background:var(--leaf)}.farm-plot .plant-bloom i{background:var(--petal)}.farm-plot .plant-bloom:after{background:var(--center)}
+.plant-sunflower{--petal:#e6b82e;--center:#68472d;--leaf:#668052;--stem:#5d784d}.plant-sunflower .plant-bloom{width:26px;height:26px;left:7px;top:-2px}.plant-sunflower .plant-bloom i{left:9px;width:8px;height:17px;border-radius:75% 25% 72% 28%}.plant-sunflower .plant-bloom:after{left:7px;top:7px;width:13px;height:13px;background:radial-gradient(circle,#3f2b20 0 18%,#6b492b 20% 55%,#8c6633 57%)}
+.plant-epiphyllum{--petal:#fffdf2;--center:#e9d6a3;--leaf:#577a5b;--stem:#4f7355}.plant-epiphyllum .plant-bloom{width:34px;height:26px;left:3px;top:-1px}.plant-epiphyllum .plant-bloom i{left:13px;width:7px;height:21px;border-radius:100% 12% 100% 15%;box-shadow:0 0 0 1px rgba(212,205,187,.35)}.plant-epiphyllum .plant-bloom:after{left:13px;top:11px;width:8px;height:5px;background:#f1d58c;box-shadow:0 0 7px rgba(255,249,218,.8)}
+.plant-gardenia{--petal:#fffdf3;--center:#e7d9a5;--leaf:#426b4a;--stem:#3f6447}.plant-lisianthus{--petal:#9276ad;--center:#d9c6a0}.plant-hydrangea{--petal:#87a6c5;--center:#e5d7a8}.plant-lavender{--petal:#80699b;--center:#66567e;--leaf:#74826d}.plant-lotus{--petal:#e8a9b6;--center:#e8c85d;--leaf:#5f866d}.plant-calla{--petal:#fffdf2;--center:#e4c84d;--leaf:#67855f}.plant-babysbreath{--petal:#fffefa;--center:#d9cea9}.plant-sea_lavender,.plant-forget_me_not{--petal:#7299c8;--center:#e7cf52}.plant-eucalyptus{--petal:#9aafa0;--center:#778f80;--leaf:#799486}
+.plant-tulip{--petal:#d75f5f;--center:#4c4030}.plant-peony{--petal:#d9879b;--center:#e7c363}.plant-lily_of_valley{--petal:#fffdf5;--center:#e6dba6}.plant-sweetpea{--petal:#cf91b0;--center:#ecd2a3}.plant-cherry{--petal:#f1b7c3;--center:#c98783}
+.plant-osmanthus{--petal:#e7bd4e;--center:#bd8730}.plant-cosmos{--petal:#df7da3;--center:#e1b52d}.plant-chrysanthemum{--petal:#fff9df;--center:#e3b72e}.plant-spider_lily{--petal:#c92f32;--center:#8d1e22;--leaf:#55734f}.plant-maple{--petal:#b84c3f;--center:#7a382f;--leaf:#a54b3d}
+.plant-flower{--petal:#fffdf3;--center:#8cae75}.plant-plum{--petal:#e6bf47;--center:#9e6c28}.plant-narcissus{--petal:#fffdf1;--center:#e3a62b}.plant-camellia{--petal:#bf3f49;--center:#e1bb42}.plant-hellebore{--petal:#a57a98;--center:#d7c38b}
+/* Produce crops use fruit/seed colors instead of generic blossoms. */
+.plant-tomato{--petal:#d95345;--center:#8f2f26}.plant-corn{--petal:#e3bd43;--center:#9a7730}.plant-pumpkin{--petal:#d98532;--center:#875127}.plant-apple{--petal:#bc4e45;--center:#754334}.plant-carrot{--petal:#e48536;--center:#9e5527}.plant-cabbage{--petal:#90a86f;--center:#657a50}.plant-pea{--petal:#7da566;--center:#58764e}.plant-wheat{--petal:#cba85a;--center:#9c793c}.plant-snowcrop{--petal:#f1eee1;--center:#b8d1a1}
+
+#shopPage,#kitchenPage{background:var(--journal-base,#eee9df);color:var(--journal-ink,#41443d)}#shopPage .sub-header,#kitchenPage .sub-header{background:color-mix(in srgb,var(--journal-base,#eee9df) 90%,transparent);border-bottom:1px solid var(--journal-line,#d8d0c2)}#shopPage .kitchen-wrap,#kitchenPage .kitchen-wrap{max-width:620px;padding:17px 16px 92px}.kitchen-scene{height:190px;border-radius:2px;background:linear-gradient(180deg,var(--journal-paper,#f8f5ed) 0 63%,#bda78d 63% 67%,#d7c4aa 67%);border:1px solid var(--journal-line,#d8d0c2);box-shadow:0 9px 25px rgba(70,57,41,.09);overflow:hidden}.kitchen-scene:before{content:'';position:absolute;left:0;right:0;bottom:0;height:33%;background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(103,77,54,.14) 42px 44px),linear-gradient(#d7c4aa,#c9b294)}.kitchen-scene:after{content:'';position:absolute;left:50%;bottom:29px;width:92px;height:37px;transform:translateX(-50%);border:5px solid #8d8173;border-top:0;border-radius:0 0 48px 48px;background:#c6d1cf;box-shadow:inset 0 8px rgba(255,255,255,.28)}.kitchen-window{left:18px;top:18px;width:104px;height:78px;border:7px solid #f2ede3;background:linear-gradient(#a8c5cf,#e7dfc9);box-shadow:0 3px 0 #b8aa97}.kitchen-window:before{left:43px}.kitchen-window:after{top:32px}.kitchen-shelf{right:18px;top:33px;width:130px;height:7px;background:#7c654f;border-radius:1px;box-shadow:0 43px #7c654f}.kitchen-shelf:after{content:'';position:absolute;right:4px;top:53px;width:66px;height:44px;background:linear-gradient(90deg,#8d806e 0 11px,transparent 11px 16px,#a18d72 16px 28px,transparent 28px 33px,#7d8b80 33px 45px,transparent 45px 49px,#b69c77 49px 62px);border-bottom:3px solid #775f49}.kitchen-jar{top:-23px;height:22px;border-radius:2px 2px 6px 6px}.kitchen-pot{right:37px;bottom:23px;width:58px;height:33px;z-index:2}.kitchen-pot:before{box-shadow:13px -13px 0 -3px rgba(255,255,255,.34),22px -24px 0 -6px rgba(255,255,255,.24)}.kitchen-caption{left:17px;bottom:17px;z-index:2;background:rgba(248,245,237,.76);padding:5px 9px;color:#655b4e;font:10px Georgia,'Noto Serif SC',serif;letter-spacing:2px}.kitchen-tabs,.shop-cats{gap:6px}.kitchen-tab{border-radius:1px;background:var(--journal-paper,#f8f5ed);border:1px solid var(--journal-line,#d8d0c2)}.kitchen-tab.active{background:var(--accent);border-color:var(--accent)}.kitchen-summary,.custom-hint{border-radius:1px;background:var(--journal-soft,#e8e2d7);border:1px solid var(--journal-line,#d8d0c2)}.kitchen-card{border-radius:1px;background:var(--journal-paper,#f8f5ed);border-color:var(--journal-line,#d8d0c2);box-shadow:2px 3px 0 rgba(92,76,55,.07)}.kitchen-card:nth-child(even){transform:rotate(.25deg)}.kitchen-action{border-radius:1px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}.kitchen-icon.seed:before{background:#d3bb91}.kitchen-icon.seed:after{background:#708765}.kitchen-icon.ingredient:before{border-color:#9d856d}.kitchen-icon.utensil:before{border-color:#737d7d;background:#abb4b2}.kitchen-icon.dish:before{border-color:#c1af9b;background:#f6f0e5}
+#shopPage .kitchen-scene:after{width:115px;height:54px;border:0;border-radius:0;background:linear-gradient(90deg,#d4b486 0 21%,#bcc9ac 21% 44%,#d2a08d 44% 68%,#b3bdc5 68%);box-shadow:0 -6px #7d654e,0 5px 0 rgba(103,76,52,.15)}#shopPage .kitchen-pot{display:none}#shopPage .kitchen-caption:before{content:'GENERAL STORE · ';font:8px Georgia,serif;color:var(--accent)}
+
 </style>
 </head>
 <body>
@@ -52,13 +114,18 @@ textarea#io{width:100%;height:160px;border:1px solid var(--line);border-radius:1
 <header><h1 id="title">slowgarden</h1><div class="bar"><span id="barDay"></span> · <span id="barSeason"></span> · <span id="barCoins"></span></div></header>
 <div id="warnBox"></div>
 
-<section id="farm" class="on">
-  <h2>田 地</h2><div class="grid" id="plots"></div>
-  <div class="card" id="seedPick" style="margin-top:10px;padding:12px 14px"></div>
+<section id="farmPage" class="on"><div class="farm-sheet">
+  <div class="farm-heading"><small>GARDEN LOG · 四季の小庭</small><h2 id="farmTitle">我的小院子</h2><p>播种，等待，然后把成熟的日子轻轻收好。</p></div>
+  <div class="farm-meta"><span id="farmSeason"></span><span id="farmCoins"></span></div>
+  <div class="farm-grid" id="plots"></div>
+  <div class="seed-panel"><div class="seed-title">SEED STOCK · 种子袋</div><div class="seed-picker" id="seedPick"></div><div style="font-size:9px;color:#928c80;margin-top:10px;letter-spacing:.5px;">先选种子，再轻触一块空地。</div></div>
   <div class="btns"><button class="act ghost" onclick="G.advance(1)">过一天</button><button class="act ghost" onclick="G.advance(3)">过三天</button></div>
-</section>
-<section id="shop"><h2>商 店</h2><div id="shopList"></div><h2>小 票</h2><div class="card" id="receiptBox"></div></section>
-<section id="kitchen"><h2>厨 房</h2><div id="recipeList"></div></section>
+  <div class="farm-stamp">GROW WITH TIME</div>
+</div></section>
+<section id="shopPage"><div class="kitchen-scene"><div class="kitchen-window"></div><div class="kitchen-shelf"><i class="kitchen-jar j1"></i><i class="kitchen-jar j2"></i><i class="kitchen-jar j3"></i></div><div class="kitchen-pot"></div><div class="kitchen-caption">杂货铺</div></div>
+  <div class="kitchen-grid" id="shopList"></div><h2>小 票</h2><div class="card" id="receiptBox"></div></section>
+<section id="kitchenPage"><div class="kitchen-scene"><div class="kitchen-window"></div><div class="kitchen-shelf"><i class="kitchen-jar j1"></i><i class="kitchen-jar j2"></i><i class="kitchen-jar j3"></i></div><div class="kitchen-pot"></div><div class="kitchen-caption">KITCHEN · 今日料理</div></div>
+  <div class="kitchen-grid" id="recipeList"></div></section>
 <section id="bag">
   <h2>仓 库</h2><div class="card" id="storageBox"></div>
   <h2>调 料</h2><div class="card" id="pantryBox"></div>
@@ -89,7 +156,7 @@ textarea#io{width:100%;height:160px;border:1px solid var(--line);border-radius:1
   </div>
 </section>
 </div>
-<nav><button class="on" data-tab="farm">农场</button><button data-tab="shop">商店</button><button data-tab="kitchen">厨房</button><button data-tab="bag">背包</button><button data-tab="together">一起</button><button data-tab="save">存档</button></nav>
+<nav><button class="on" data-tab="farmPage">农场</button><button data-tab="shopPage">商店</button><button data-tab="kitchenPage">厨房</button><button data-tab="bag">背包</button><button data-tab="together">一起</button><button data-tab="save">存档</button></nav>
 
 <script>
 /* ===== 规则（由 tools/build-single.js 从 catalog.json 和 state.json 生成，改规则请改那两个文件再重新生成）===== */
@@ -268,23 +335,27 @@ function render(){
   document.getElementById('barSeason').textContent = (m.season_names || {})[cur] + '季';
   document.getElementById('barCoins').textContent = state.players.map(function(x){ return x.name + ' ' + x.coins + ' 金'; }).join(' · ');
   var v = validate(); document.getElementById('warnBox').innerHTML = v.length ? '<div class="warn">规则有问题：' + v.map(esc).join('；') + '</div>' : '';
+  document.getElementById('farmTitle').textContent = m.title || '我的小院子';
+  document.getElementById('farmSeason').textContent = (m.season_names || {})[cur] + '季 · 第 ' + state.meta.day + ' 天';
+  document.getElementById('farmCoins').textContent = p.coins + ' 金';
+  var plantArt = '<div class="plant-art"><i class="plant-stem"></i><i class="plant-leaf l1"></i><i class="plant-leaf l2"></i><i class="plant-leaf l3"></i><span class="plant-bloom"><i></i><i></i><i></i><i></i><i></i></span></div>';
   document.getElementById('plots').innerHTML = state.plots.map(function(pl){
-    if (!pl.item) return '<div class="plot" onclick="G.plant(' + JSON.stringify(pl.id) + ')"><small>#' + pl.id + '</small><strong>空地</strong><small>点这里种</small></div>';
+    if (!pl.item) return '<div class="farm-plot empty" onclick="G.plant(' + JSON.stringify(pl.id) + ')"><div class="plot-copy"><div class="plot-name">空地</div><div class="plot-status">等待播种</div></div></div>';
     var c = CATALOG.crops[pl.item] || {}, age = state.meta.day - pl.planted_day, ok = age >= (c.grow_days || 1);
-    return '<div class="plot' + (ok ? ' ready' : '') + '" onclick="G.harvest(' + JSON.stringify(pl.id) + ')"><small>#' + pl.id + '</small><strong>' + esc(c.name) + '</strong><small>' + (ok ? '可以收了' : age + '/' + c.grow_days + ' 天') + '</small></div>'; }).join('');
+    return '<div class="farm-plot plant-' + esc(pl.item) + (ok ? ' mature harvest-btn' : ' growing') + '" onclick="G.harvest(' + JSON.stringify(pl.id) + ')">' + plantArt + '<div class="plot-copy"><div class="plot-name">' + esc(c.name) + '</div><div class="plot-status">' + (ok ? '可收获' : age + '/' + c.grow_days + '天') + '</div></div></div>'; }).join('');
   var seeds = ks(p.seeds).filter(function(k){ return p.seeds[k] > 0; });
-  document.getElementById('seedPick').innerHTML = '<div class="meta">选一样种子，再点上面的空地：</div>' + (seeds.length ? seeds.map(function(k){ return '<span class="seedbtn' + (picked === k ? ' on' : '') + '" onclick="picked=' + esc(JSON.stringify(k)) + ';render()">' + esc(cropName(k)) + ' ×' + p.seeds[k] + '</span>'; }).join('') : '<div class="empty">种子袋空了，去商店买点吧</div>');
+  document.getElementById('seedPick').innerHTML = seeds.length ? seeds.map(function(k){ return '<span class="seed-choice' + (picked === k ? ' active' : '') + '" onclick="picked=' + esc(JSON.stringify(k)) + ';render()">' + esc(cropName(k)) + ' ×' + p.seeds[k] + '</span>'; }).join('') : '<div style="font-size:11px;color:#928c80">种子袋空了，先去杂货铺买些种子吧</div>';
   var rows = [];
-  ks(CATALOG.crops).forEach(function(k){ var c = CATALOG.crops[k]; if (typeof c.seed_price === 'number') rows.push({ id: 'seed_' + k, name: c.name + '种子', meta: (m.season_names || {})[c.season] + '季 · ' + c.grow_days + ' 天 · 卖 ' + c.value + ' 金' + (c.season !== cur ? ' · 不在季' : ''), price: c.seed_price }); });
-  ks(CATALOG.supplies).forEach(function(k){ var s = CATALOG.supplies[k]; rows.push({ id: k, name: s.name, meta: '调料 · 一份 ' + s.portions + ' 次', price: s.price }); });
-  ks(CATALOG.drinks).forEach(function(k){ var d = CATALOG.drinks[k]; rows.push({ id: k, name: d.name, meta: '饮料 · ' + d.amount + ' 瓶', price: d.price }); });
-  ks(CATALOG.utensils).forEach(function(k){ var u = CATALOG.utensils[k]; rows.push({ id: k, name: u.name, meta: '厨具', price: u.price }); });
-  document.getElementById('shopList').innerHTML = '<div class="card">' + rows.map(function(r){ return '<div class="row"><div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + esc(r.meta) + '</div></div><span class="meta">' + r.price + ' 金</span><button class="act" onclick="G.buy(' + esc(JSON.stringify(r.id)) + ')">买</button></div>'; }).join('') + '</div>';
+  ks(CATALOG.crops).forEach(function(k){ var c = CATALOG.crops[k]; if (typeof c.seed_price === 'number') rows.push({ icon: 'seed', id: 'seed_' + k, name: c.name + '种子', meta: (m.season_names || {})[c.season] + '季 · ' + c.grow_days + ' 天 · 卖 ' + c.value + ' 金' + (c.season !== cur ? ' · 不在季' : ''), price: c.seed_price }); });
+  ks(CATALOG.supplies).forEach(function(k){ var s = CATALOG.supplies[k]; rows.push({ icon: 'ingredient', id: k, name: s.name, meta: '调料 · 一份 ' + s.portions + ' 次', price: s.price }); });
+  ks(CATALOG.drinks).forEach(function(k){ var d = CATALOG.drinks[k]; rows.push({ icon: 'ingredient', id: k, name: d.name, meta: '饮料 · ' + d.amount + ' 瓶', price: d.price }); });
+  ks(CATALOG.utensils).forEach(function(k){ var u = CATALOG.utensils[k]; rows.push({ icon: 'utensil', id: k, name: u.name, meta: '厨具', price: u.price }); });
+  document.getElementById('shopList').innerHTML = rows.map(function(r){ return '<div class="kitchen-card"><div class="kitchen-icon ' + r.icon + '"></div><div class="k-name">' + esc(r.name) + '</div><div class="k-meta">' + esc(r.meta) + '<br>' + r.price + ' 金</div><button class="kitchen-action" onclick="G.buy(' + esc(JSON.stringify(r.id)) + ')">买一份</button></div>'; }).join('');
   var rc = (state.receipts || []).slice().reverse().slice(0, 10);
   document.getElementById('receiptBox').innerHTML = rc.length ? rc.map(function(r){ return '<div class="row"><div class="info"><div class="name">' + esc(r.item) + '</div><div class="meta">第 ' + r.day + ' 天 · ' + esc(r.who) + ' · 剩 ' + r.balance + ' 金</div></div><span class="meta">-' + r.price + '</span></div>'; }).join('') : '<div class="empty">还没买过东西</div>';
-  document.getElementById('recipeList').innerHTML = '<div class="card">' + ks(CATALOG.recipes).map(function(k){ var r = CATALOG.recipes[k];
+  document.getElementById('recipeList').innerHTML = ks(CATALOG.recipes).map(function(k){ var r = CATALOG.recipes[k];
     var need = [].concat(ks(r.crops).map(function(x){ return cropName(x) + '×' + r.crops[x]; }), ks(r.supplies).map(function(x){ return (CATALOG.supplies[x] || {}).name + '×' + r.supplies[x]; }), (r.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name; })).join('、');
-    return '<div class="row"><div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + esc(need) + '</div></div><button class="act" onclick="G.cook(' + esc(JSON.stringify(k)) + ')">做</button></div>'; }).join('') + '</div>';
+    return '<div class="kitchen-card"><div class="kitchen-icon dish"></div><div class="k-name">' + esc(r.name) + '</div><div class="k-meta">' + esc(need) + '</div><button class="kitchen-action" onclick="G.cook(' + esc(JSON.stringify(k)) + ')">做这道</button></div>'; }).join('');
   var st = p.storage || [];
   document.getElementById('storageBox').innerHTML = st.length ? st.map(function(x){ return '<div class="row"><div class="info"><div class="name">' + esc(cropName(x.item)) + '</div><div class="meta">×' + x.count + ' · 一个卖 ' + ((CATALOG.crops[x.item] || {}).value || 0) + ' 金</div></div><button class="act ghost" onclick="G.sell(' + esc(JSON.stringify(x.item)) + ')">卖一个</button></div>'; }).join('') : '<div class="empty">仓库空的</div>';
   function box(o, nm){ var k = ks(o).filter(function(x){ return o[x] > 0; }); return k.length ? k.map(function(x){ return '<div class="row"><div class="name">' + esc(nm(x)) + '</div><span class="meta">×' + o[x] + '</span></div>'; }).join('') : '<div class="empty">空</div>'; }
