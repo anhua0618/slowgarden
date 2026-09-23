@@ -26,5 +26,5 @@ const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><met
 <section><h2>作物目录</h2><p class="note">修改 catalog.json 后重新运行 node render.js 即可刷新。</p><table><thead><tr><th>作物</th><th>季节</th><th>成长</th><th>售价</th><th>种子价</th></tr></thead><tbody>${cropRows}</tbody></table></section>
 <section><h2>菜谱目录</h2><table><thead><tr><th>菜名</th><th>作物</th><th>调料</th><th>厨具</th></tr></thead><tbody>${recipeRows}</tbody></table></section>
 <section><h2>最近记录</h2><ul>${log}</ul></section><footer>这是开源模板生成的静态预览，不含任何真实存档、密钥或私人数据。</footer></body></html>`;
-fs.writeFileSync(path.join(root, 'index.html'), html);
+fs.writeFileSync(path.join(root, 'preview.html'), html);
 console.log(`HTML_OK ${Buffer.byteLength(html)} bytes`);

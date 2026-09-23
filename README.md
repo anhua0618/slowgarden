@@ -85,7 +85,7 @@ npm start
 | `engine.js` | 买、种、收、卖、做饭和推进时间的核心逻辑 |
 | `server.js` | 本地服务：把引擎包成网页可调用的接口 |
 | `public/index.html` | 人类操作的交互页面（农场·商店·厨房·背包） |
-| `render.js` | 读取规则与存档，生成静态预览 `index.html`（可选） |
+| `render.js` | 读取规则与存档，生成静态预览 `preview.html`（可选） |
 
 | `init.js` | 初始化或重置本地存档 |
 | `test.js` | 基础逻辑的自动测试 |
@@ -142,7 +142,9 @@ MIT License
 
 ## 双击就能玩：单文件版 `slowgarden.html`
 
-**手机直接玩：https://anhua0618.github.io/slowgarden/slowgarden.html**（小白教程见 [教程.md](教程.md)）
+**手机直接玩：[anhua0618.github.io/slowgarden](https://anhua0618.github.io/slowgarden/)**
+
+小白教程见 [教程.md](教程.md)
 
 不想装 Node？直接双击仓库里的 **`slowgarden.html`**，用浏览器打开就能玩，手机也行。
 

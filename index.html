@@ -1,9 +1,481 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>我的小院子 · 开源模板</title><style>
-:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#2e3040;background:#f5f1eb}*{box-sizing:border-box}body{margin:0;max-width:1100px;margin:auto;padding:24px}header{padding:28px;border-radius:24px;background:linear-gradient(135deg,#dcefe4,#f7dfcc);box-shadow:0 8px 24px #806d5424}h1{margin:0 0 8px}h2{margin:0 0 14px}section{background:#fffaf5;border:1px solid #eadfd2;border-radius:18px;padding:18px;margin-top:18px;box-shadow:0 4px 14px #806d5412}.stats,.plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.stat,.plot{padding:14px;border-radius:14px;background:#f4eee6}.stat b,.plot strong,.plot small{display:block}.plot.ready{background:#e4f4df;border:1px solid #acd399}.plot small{margin-top:7px;color:#6b6870}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #eee4d9}th{color:#756c60}ul{padding-left:20px;line-height:1.8}.columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.note{color:#716c67;font-size:.92rem}footer{padding:22px 0;color:#79716a;font-size:.85rem}@media(max-width:600px){body{padding:12px}section,header{padding:15px;overflow:auto}table{font-size:.86rem;min-width:620px}}
-</style></head><body><header><h1>我的小院子</h1><p>可自由修改的开源农场 × 厨房模板 · 当前第 1 天 · 春季</p></header>
-<section><h2>当前状态</h2><div class="stats"><div class="stat"><b>玩家</b>玩家</div><div class="stat"><b>金币</b>100 金</div><div class="stat"><b>地块</b>6 块</div><div class="stat"><b>作物</b>7 种</div><div class="stat"><b>菜谱</b>3 道</div></div></section>
-<section><h2>农场</h2><div class="plots"><article class="plot "><b>#1</b><strong>空地</strong><small>等待种植</small></article><article class="plot "><b>#2</b><strong>空地</strong><small>等待种植</small></article><article class="plot "><b>#3</b><strong>空地</strong><small>等待种植</small></article><article class="plot "><b>#4</b><strong>空地</strong><small>等待种植</small></article><article class="plot "><b>#5</b><strong>空地</strong><small>等待种植</small></article><article class="plot "><b>#6</b><strong>空地</strong><small>等待种植</small></article></div></section>
-<section><h2>库存</h2><div class="columns"><div><h3>仓库</h3><ul><li>空</li></ul></div><div><h3>调料柜</h3><ul><li>空</li></ul></div><div><h3>饮料柜</h3><ul><li>空</li></ul></div><div><h3>厨具</h3><ul><li>空</li></ul></div></div></section>
-<section><h2>作物目录</h2><p class="note">修改 catalog.json 后重新运行 node render.js 即可刷新。</p><table><thead><tr><th>作物</th><th>季节</th><th>成长</th><th>售价</th><th>种子价</th></tr></thead><tbody><tr><td>豌豆</td><td>spring</td><td>3 天</td><td>15 金</td><td>8 金</td></tr><tr><td>番茄</td><td>summer</td><td>4 天</td><td>25 金</td><td>11 金</td></tr><tr><td>玉米</td><td>summer</td><td>5 天</td><td>30 金</td><td>14 金</td></tr><tr><td>向日葵</td><td>summer</td><td>4 天</td><td>22 金</td><td>10 金</td></tr><tr><td>南瓜</td><td>autumn</td><td>5 天</td><td>35 金</td><td>16 金</td></tr><tr><td>卷心菜</td><td>autumn</td><td>4 天</td><td>20 金</td><td>9 金</td></tr><tr><td>水仙</td><td>winter</td><td>3 天</td><td>30 金</td><td>14 金</td></tr></tbody></table></section>
-<section><h2>菜谱目录</h2><table><thead><tr><th>菜名</th><th>作物</th><th>调料</th><th>厨具</th></tr></thead><tbody><tr><td>清炒豌豆</td><td>豌豆</td><td>盐</td><td>平底锅、白瓷盘</td></tr><tr><td>凉拌番茄</td><td>番茄</td><td>糖</td><td>白瓷盘</td></tr><tr><td>玉米浓汤</td><td>玉米</td><td>盐</td><td>汤锅、白瓷盘</td></tr></tbody></table></section>
-<section><h2>最近记录</h2><ul><li><b>第 1 天</b> 系统：新的小院子开始了</li></ul></section><footer>这是开源模板生成的静态预览，不含任何真实存档、密钥或私人数据。</footer></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>slowgarden · 单文件版</title>
+<style>
+/* 单文件版：双击就能玩，存档放在浏览器里，也能导出给 AI 看。
+   样式照「素」的方向：浅纸色、细线、圆角，不要渐变。改颜色只动 :root 这几行 */
+:root{--paper:#f8f5ed;--base:#eee9df;--line:#d8d0c2;--ink:#41443d;--muted:#888276;--accent:#6f7c62;--soft:#e8e2d7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--base);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Segoe UI",sans-serif;font-size:14px}
+.wrap{max-width:520px;margin:0 auto;padding:18px 16px 90px}
+#farmPage.on,#shopPage.on,#kitchenPage.on{display:block}
+header{padding:18px 18px 14px;border:1px solid var(--line);border-radius:18px;background:var(--paper);margin-bottom:14px}
+h1{margin:0 0 6px;font-size:20px;font-weight:500;letter-spacing:2px}
+.bar{font-size:12px;color:var(--muted);letter-spacing:1px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;background:var(--paper);border-top:1px solid var(--line);z-index:10;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;max-width:104px;border:0;background:none;padding:13px 4px;font:13px inherit;letter-spacing:2px;color:var(--muted);cursor:pointer}
+nav button.on{color:var(--ink);font-weight:600}
+section{display:none}section.on{display:block}
+h2{font-size:12px;font-weight:500;letter-spacing:3px;color:var(--muted);margin:18px 2px 8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.plot{aspect-ratio:1;border-radius:14px;border:1px dashed #cfc6b3;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;cursor:pointer;padding:6px;text-align:center;gap:3px}
+.plot strong{font-weight:500}.plot small{font-size:10px;color:var(--muted)}
+.plot.ready{border-style:solid;border-color:var(--accent);background:var(--soft)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:4px 14px;margin-bottom:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.info{flex:1}.name{font-size:14px}.meta{font-size:11px;color:var(--muted);margin-top:2px}
+button.act{border:0;border-radius:999px;padding:7px 16px;background:var(--accent);color:#fff;font:12px inherit;cursor:pointer}
+button.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.empty{color:var(--muted);font-size:12px;padding:12px 0}
+.seedbtn{display:inline-block;margin:4px 4px 0 0;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;cursor:pointer}
+.seedbtn.on{border-color:var(--accent);background:var(--soft)}
+.warn{border:1px solid #efc9bd;background:#fff6f2;color:#9a4a3a;border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:10px}
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:rgba(50,50,46,.9);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;z-index:50;opacity:0;transition:.25s;pointer-events:none;max-width:88%}
+#toast.show{opacity:1}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+/* 一起 */
+.tg{text-align:center;padding:14px 0}
+.tg-time{font-size:44px;font-weight:300;letter-spacing:2px;font-variant-numeric:tabular-nums;margin:6px 0}
+.tg-sub{font-size:12px;color:var(--muted);letter-spacing:1px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:12px 0}
+.chips button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 14px;font:12px inherit;color:var(--muted);cursor:pointer}
+.chips button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+input.note,select.mins{border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff;font:14px inherit;text-align:center}
+textarea#io{width:100%;height:160px;border:1px solid var(--line);border-radius:12px;padding:10px;font:12px ui-monospace,monospace;background:#fff}
+/* ===== 以下样式来自安和霁家里的农场/厨房（Sol 画的纸本手帐风），原样搬过来 ===== */
+:root{--journal-paper:#f8f5ed;--journal-base:#eee9df;--journal-soft:#e8e2d7;--journal-line:#d8d0c2;--journal-ink:#41443d;--journal-muted:#888276;--card:#f8f5ed;--border:#d8d0c2;--sub:#888276}
+.farm-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.kitchen-card .k-name{font-size:13px;margin-bottom:3px}.kitchen-card .k-meta{font-size:10px;color:#8c897f;line-height:1.6;flex:1}
+.kitchen-action{margin-top:8px;border:0;padding:7px 10px;font:12px inherit;cursor:pointer}
+.kitchen-wrap{padding:16px 20px 28px;max-width:560px;margin:0 auto;}
+.kitchen-scene{height:142px;border-radius:18px;background:linear-gradient(180deg,#ebe6dd 0 62%,#c9b69e 62% 66%,#e1d5c4 66%);position:relative;overflow:hidden;border:1px solid var(--border);margin-bottom:14px;}
+.kitchen-window{position:absolute;left:20px;top:18px;width:82px;height:58px;border:6px solid #f7f4ed;background:linear-gradient(#b9d2dc,#e8e2cf);box-shadow:0 3px 8px rgba(44,44,44,.08);}
+.kitchen-window:after{content:'';position:absolute;background:#f7f4ed;}
+.kitchen-window:before{width:5px;height:100%;left:33px;top:0}
+.kitchen-window:after{height:5px;width:100%;left:0;top:24px}
+.kitchen-shelf{position:absolute;right:18px;top:25px;width:112px;height:7px;background:#856d58;border-radius:3px;box-shadow:0 34px #856d58;}
+.kitchen-jar{position:absolute;top:-20px;width:18px;height:19px;border:2px solid rgba(255,255,255,.8);background:#c8a879;border-radius:3px 3px 6px 6px;}
+.kitchen-jar.j1{left:9px}
+.kitchen-jar.j2{left:39px;background:#b9a5a0}
+.kitchen-jar.j3{left:69px;background:#9cae91}
+.kitchen-pot{position:absolute;right:45px;bottom:21px;width:52px;height:30px;border:4px solid #6c7476;border-radius:4px 4px 16px 16px;background:#aab1b0;}
+.kitchen-pot:before{content:'';position:absolute;width:34px;height:5px;border-radius:5px;background:#666;left:5px;top:-12px;}
+.kitchen-pot:after{content:'';position:absolute;width:24px;height:5px;background:#6c7476;right:-25px;top:5px;border-radius:0 4px 4px 0;}
+.kitchen-caption{position:absolute;left:18px;bottom:14px;font-size:11px;letter-spacing:2px;color:#665b50;}
+.kitchen-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.kitchen-tab{border:1px solid var(--border);background:var(--card);padding:10px;border-radius:12px;color:var(--sub);font:12px inherit;letter-spacing:1px;}
+.kitchen-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.kitchen-summary{font-size:11px;color:var(--sub);line-height:1.8;padding:10px 12px;background:rgba(255,255,255,.42);border-radius:12px;margin-bottom:12px;white-space:pre-line;}
+.kitchen-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.kitchen-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px;min-height:130px;display:flex;flex-direction:column;box-shadow:0 5px 18px rgba(58,50,42,.04);}
+.kitchen-icon{height:42px;margin-bottom:9px;position:relative;}
+.kitchen-icon.seed:before{content:'';position:absolute;left:8px;top:4px;width:28px;height:34px;background:#d8c09b;border-radius:5px 5px 9px 9px;transform:rotate(-3deg);box-shadow:inset 0 -8px rgba(130,100,65,.08);}
+.kitchen-icon.seed:after{content:'';position:absolute;left:20px;top:13px;width:7px;height:15px;border-radius:100% 0 100% 0;background:#6f8a68;transform:rotate(-30deg);}
+.kitchen-icon.ingredient:before{content:'';position:absolute;left:10px;top:5px;width:24px;height:34px;border:2px solid #a88f75;border-radius:5px 5px 9px 9px;background:rgba(255,255,255,.55);}
+.kitchen-icon.ingredient:after{content:'';position:absolute;left:13px;top:2px;width:22px;height:7px;border-radius:3px;background:#7b6e60;}
+.kitchen-icon.utensil:before{content:'';position:absolute;left:7px;top:7px;width:31px;height:24px;border:3px solid #7d8586;border-radius:4px 4px 14px 14px;background:#b7bdbc;}
+.kitchen-icon.utensil:after{content:'';position:absolute;left:38px;top:15px;width:22px;height:5px;background:#7d8586;border-radius:4px;}
+.kitchen-icon.dish:before{content:'';position:absolute;left:6px;top:13px;width:52px;height:20px;border:3px solid #c7b8a7;border-radius:50%;background:#f5f0e8;}
+.kitchen-icon.dish:after{content:'';position:absolute;left:20px;top:10px;width:25px;height:17px;border-radius:50%;background:#c98f72;box-shadow:7px 1px #d6b26f;}
+.kitchen-name{font-size:13px;color:var(--ink);margin-bottom:4px;}
+.kitchen-note{font-size:10px;color:var(--sub);line-height:1.5;flex:1;}
+.kitchen-action{margin-top:10px;border:0;border-radius:9px;padding:8px;background:rgba(58,90,107,.1);color:var(--accent);font:11px inherit;}
+.kitchen-action:active{background:var(--accent);color:#fff;}
+.kitchen-empty{text-align:center;padding:36px 10px;color:var(--sub);font-size:12px;grid-column:1/-1;}
+.kitchen-tab{border-radius:0!important;border:1px solid #858b78!important;background:transparent!important;color:#69705f!important;letter-spacing:1px;}
+.kitchen-tab.active{background:#7b816f!important;color:#fff!important;}
+.kitchen-grid{gap:10px;}
+#farmPage{background:#eee9df;color:#41443d;min-height:100vh}
+#farmPage:before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.32;background:repeating-linear-gradient(0deg,rgba(83,76,64,.025) 0 1px,transparent 1px 4px)}
+.farm-journal{max-width:620px;margin:auto;padding:16px 16px 92px}.farm-sheet{position:relative;background:#f8f5ed;border:1px solid #d8d0c2;box-shadow:0 10px 28px rgba(68,59,45,.08);padding:25px 18px 28px;overflow:hidden}.farm-sheet:before{content:'';position:absolute;top:8px;right:34px;width:76px;height:21px;background:rgba(191,181,151,.38);transform:rotate(2deg)}.farm-heading{padding:10px 0 15px;border-bottom:1px solid #cfc7b8;margin-bottom:17px}.farm-heading small{font-size:9px;letter-spacing:2.3px;color:#918b7e}.farm-heading h2{font:400 25px Georgia,'Noto Serif SC',serif;letter-spacing:4px;margin:5px 0}.farm-heading p{font-size:10px;color:#888276;letter-spacing:.5px}.farm-meta{display:flex;justify-content:space-between;margin-bottom:14px;font:10px Georgia,serif;color:#74786b;letter-spacing:1px}.farm-grid{max-width:none!important;gap:9px!important;margin-bottom:20px!important}.farm-plot{aspect-ratio:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:7px 4px;background:#e7dfd1;border:1px solid #cfc4b3;overflow:hidden;color:#4c5048;cursor:default}.farm-plot:before{content:'';position:absolute;left:8px;right:8px;bottom:7px;height:31%;background:repeating-linear-gradient(165deg,#92785e 0 3px,#80694f 3px 6px);border-radius:50% 50% 10% 10%}.farm-plot.empty{cursor:pointer;background:#eee8dc}.farm-plot.empty:after{content:'＋';position:absolute;top:25%;font:22px Georgia;color:#a69b8a}.farm-plot.empty .plot-name{color:#918a7e}.plant-art{position:absolute;left:50%;bottom:29%;width:38px;height:49px;transform:translateX(-50%);z-index:1}.plant-stem{position:absolute;left:18px;bottom:0;width:2px;height:34px;background:#6f7c62}.plant-leaf{position:absolute;width:18px;height:10px;background:#829276;border-radius:100% 0 100% 0}.plant-leaf.l1{left:1px;bottom:16px;transform:rotate(18deg)}.plant-leaf.l2{right:0;bottom:23px;transform:scaleX(-1) rotate(15deg)}.plant-leaf.l3{left:3px;bottom:29px;transform:rotate(26deg) scale(.82)}.plant-bloom{display:none;position:absolute;left:10px;top:0;width:20px;height:20px}.plant-bloom i{position:absolute;left:7px;top:0;width:7px;height:13px;background:#c8ab9f;border-radius:80% 20% 70% 30%;transform-origin:50% 100%}.plant-bloom i:nth-child(2){transform:rotate(72deg)}.plant-bloom i:nth-child(3){transform:rotate(144deg)}.plant-bloom i:nth-child(4){transform:rotate(216deg)}.plant-bloom i:nth-child(5){transform:rotate(288deg)}.plant-bloom:after{content:'';position:absolute;left:7px;top:7px;width:7px;height:7px;border-radius:50%;background:#b49a66}.farm-plot.mature{cursor:pointer;border-color:#9ca68e;background:#ebe9dd;box-shadow:inset 0 0 0 2px rgba(127,139,115,.12)}.farm-plot.mature .plant-stem{height:38px}.farm-plot.mature .plant-bloom{display:block}.plot-copy{position:relative;z-index:2;text-align:center;width:100%;margin-top:auto;background:linear-gradient(transparent,rgba(248,245,237,.92) 28%);padding-top:12px}.plot-name{font-size:10px;letter-spacing:.5px}.plot-status{font-size:8px;color:#8c897f;margin-top:2px}.farm-plot.mature .plot-status{color:#707963}.seed-panel{background:#eee9df;border:1px solid #d8d0c2;padding:13px}.seed-title{font-size:9px;color:#888276;letter-spacing:2px;margin-bottom:10px}.seed-picker{display:flex;flex-wrap:wrap;gap:7px}.seed-choice{cursor:pointer;padding:8px 11px;border:1px solid #c9c1b4;background:#f8f5ed;color:#55584f;font-size:11px}.seed-choice.on{background:#7e8673;border-color:#7e8673;color:#fff}.seed-choice span{font:9px Georgia,serif;opacity:.72;margin-left:4px}.farm-stamp{display:inline-block;margin-top:20px;border:1px solid rgba(128,139,115,.5);color:#7c866f;padding:5px 10px;font-size:9px;letter-spacing:2px;transform:rotate(-2deg)}
+@media(max-width:380px){.farm-journal{padding:11px 10px 86px}.farm-sheet{padding-left:13px;padding-right:13px}.farm-grid{gap:6px!important}.plant-art{transform:translateX(-50%) scale(.88)}}
+/* Species keep botanical colors; these do not follow journal theme colors. */
+.farm-plot{--petal:#c8ab9f;--center:#b49a66;--leaf:#829276;--stem:#6f7c62}.farm-plot .plant-stem{background:var(--stem)}.farm-plot .plant-leaf{background:var(--leaf)}.farm-plot .plant-bloom i{background:var(--petal)}.farm-plot .plant-bloom:after{background:var(--center)}
+.plant-sunflower{--petal:#e6b82e;--center:#68472d;--leaf:#668052;--stem:#5d784d}.plant-sunflower .plant-bloom{width:26px;height:26px;left:7px;top:-2px}.plant-sunflower .plant-bloom i{left:9px;width:8px;height:17px;border-radius:75% 25% 72% 28%}.plant-sunflower .plant-bloom:after{left:7px;top:7px;width:13px;height:13px;background:radial-gradient(circle,#3f2b20 0 18%,#6b492b 20% 55%,#8c6633 57%)}
+.plant-epiphyllum{--petal:#fffdf2;--center:#e9d6a3;--leaf:#577a5b;--stem:#4f7355}.plant-epiphyllum .plant-bloom{width:34px;height:26px;left:3px;top:-1px}.plant-epiphyllum .plant-bloom i{left:13px;width:7px;height:21px;border-radius:100% 12% 100% 15%;box-shadow:0 0 0 1px rgba(212,205,187,.35)}.plant-epiphyllum .plant-bloom:after{left:13px;top:11px;width:8px;height:5px;background:#f1d58c;box-shadow:0 0 7px rgba(255,249,218,.8)}
+.plant-gardenia{--petal:#fffdf3;--center:#e7d9a5;--leaf:#426b4a;--stem:#3f6447}.plant-lisianthus{--petal:#9276ad;--center:#d9c6a0}.plant-hydrangea{--petal:#87a6c5;--center:#e5d7a8}.plant-lavender{--petal:#80699b;--center:#66567e;--leaf:#74826d}.plant-lotus{--petal:#e8a9b6;--center:#e8c85d;--leaf:#5f866d}.plant-calla{--petal:#fffdf2;--center:#e4c84d;--leaf:#67855f}.plant-babysbreath{--petal:#fffefa;--center:#d9cea9}.plant-sea_lavender,.plant-forget_me_not{--petal:#7299c8;--center:#e7cf52}.plant-eucalyptus{--petal:#9aafa0;--center:#778f80;--leaf:#799486}
+.plant-tulip{--petal:#d75f5f;--center:#4c4030}.plant-peony{--petal:#d9879b;--center:#e7c363}.plant-lily_of_valley{--petal:#fffdf5;--center:#e6dba6}.plant-sweetpea{--petal:#cf91b0;--center:#ecd2a3}.plant-cherry{--petal:#f1b7c3;--center:#c98783}
+.plant-osmanthus{--petal:#e7bd4e;--center:#bd8730}.plant-cosmos{--petal:#df7da3;--center:#e1b52d}.plant-chrysanthemum{--petal:#fff9df;--center:#e3b72e}.plant-spider_lily{--petal:#c92f32;--center:#8d1e22;--leaf:#55734f}.plant-maple{--petal:#b84c3f;--center:#7a382f;--leaf:#a54b3d}
+.plant-flower{--petal:#fffdf3;--center:#8cae75}.plant-plum{--petal:#e6bf47;--center:#9e6c28}.plant-narcissus{--petal:#fffdf1;--center:#e3a62b}.plant-camellia{--petal:#bf3f49;--center:#e1bb42}.plant-hellebore{--petal:#a57a98;--center:#d7c38b}
+/* Produce crops use fruit/seed colors instead of generic blossoms. */
+.plant-tomato{--petal:#d95345;--center:#8f2f26}.plant-corn{--petal:#e3bd43;--center:#9a7730}.plant-pumpkin{--petal:#d98532;--center:#875127}.plant-apple{--petal:#bc4e45;--center:#754334}.plant-carrot{--petal:#e48536;--center:#9e5527}.plant-cabbage{--petal:#90a86f;--center:#657a50}.plant-pea{--petal:#7da566;--center:#58764e}.plant-wheat{--petal:#cba85a;--center:#9c793c}.plant-snowcrop{--petal:#f1eee1;--center:#b8d1a1}
+
+#shopPage,#kitchenPage{background:var(--journal-base,#eee9df);color:var(--journal-ink,#41443d)}#shopPage .sub-header,#kitchenPage .sub-header{background:color-mix(in srgb,var(--journal-base,#eee9df) 90%,transparent);border-bottom:1px solid var(--journal-line,#d8d0c2)}#shopPage .kitchen-wrap,#kitchenPage .kitchen-wrap{max-width:620px;padding:17px 16px 92px}.kitchen-scene{height:190px;border-radius:2px;background:linear-gradient(180deg,var(--journal-paper,#f8f5ed) 0 63%,#bda78d 63% 67%,#d7c4aa 67%);border:1px solid var(--journal-line,#d8d0c2);box-shadow:0 9px 25px rgba(70,57,41,.09);overflow:hidden}.kitchen-scene:before{content:'';position:absolute;left:0;right:0;bottom:0;height:33%;background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(103,77,54,.14) 42px 44px),linear-gradient(#d7c4aa,#c9b294)}.kitchen-scene:after{content:'';position:absolute;left:50%;bottom:29px;width:92px;height:37px;transform:translateX(-50%);border:5px solid #8d8173;border-top:0;border-radius:0 0 48px 48px;background:#c6d1cf;box-shadow:inset 0 8px rgba(255,255,255,.28)}.kitchen-window{left:18px;top:18px;width:104px;height:78px;border:7px solid #f2ede3;background:linear-gradient(#a8c5cf,#e7dfc9);box-shadow:0 3px 0 #b8aa97}.kitchen-window:before{left:43px}.kitchen-window:after{top:32px}.kitchen-shelf{right:18px;top:33px;width:130px;height:7px;background:#7c654f;border-radius:1px;box-shadow:0 43px #7c654f}.kitchen-shelf:after{content:'';position:absolute;right:4px;top:53px;width:66px;height:44px;background:linear-gradient(90deg,#8d806e 0 11px,transparent 11px 16px,#a18d72 16px 28px,transparent 28px 33px,#7d8b80 33px 45px,transparent 45px 49px,#b69c77 49px 62px);border-bottom:3px solid #775f49}.kitchen-jar{top:-23px;height:22px;border-radius:2px 2px 6px 6px}.kitchen-pot{right:37px;bottom:23px;width:58px;height:33px;z-index:2}.kitchen-pot:before{box-shadow:13px -13px 0 -3px rgba(255,255,255,.34),22px -24px 0 -6px rgba(255,255,255,.24)}.kitchen-caption{left:17px;bottom:17px;z-index:2;background:rgba(248,245,237,.76);padding:5px 9px;color:#655b4e;font:10px Georgia,'Noto Serif SC',serif;letter-spacing:2px}.kitchen-tabs,.shop-cats{gap:6px}.kitchen-tab{border-radius:1px;background:var(--journal-paper,#f8f5ed);border:1px solid var(--journal-line,#d8d0c2)}.kitchen-tab.active{background:var(--accent);border-color:var(--accent)}.kitchen-summary,.custom-hint{border-radius:1px;background:var(--journal-soft,#e8e2d7);border:1px solid var(--journal-line,#d8d0c2)}.kitchen-card{border-radius:1px;background:var(--journal-paper,#f8f5ed);border-color:var(--journal-line,#d8d0c2);box-shadow:2px 3px 0 rgba(92,76,55,.07)}.kitchen-card:nth-child(even){transform:rotate(.25deg)}.kitchen-action{border-radius:1px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}.kitchen-icon.seed:before{background:#d3bb91}.kitchen-icon.seed:after{background:#708765}.kitchen-icon.ingredient:before{border-color:#9d856d}.kitchen-icon.utensil:before{border-color:#737d7d;background:#abb4b2}.kitchen-icon.dish:before{border-color:#c1af9b;background:#f6f0e5}
+#shopPage .kitchen-scene:after{width:115px;height:54px;border:0;border-radius:0;background:linear-gradient(90deg,#d4b486 0 21%,#bcc9ac 21% 44%,#d2a08d 44% 68%,#b3bdc5 68%);box-shadow:0 -6px #7d654e,0 5px 0 rgba(103,76,52,.15)}#shopPage .kitchen-pot{display:none}#shopPage .kitchen-caption:before{content:'GENERAL STORE · ';font:8px Georgia,serif;color:var(--accent)}
+
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="wrap">
+<header><h1 id="title">slowgarden</h1><div class="bar"><span id="barDay"></span> · <span id="barSeason"></span> · <span id="barCoins"></span></div></header>
+<div id="warnBox"></div>
+
+<section id="farmPage" class="on"><div class="farm-sheet">
+  <div class="farm-heading"><small>GARDEN LOG · 四季の小庭</small><h2 id="farmTitle">我的小院子</h2><p>播种，等待，然后把成熟的日子轻轻收好。</p></div>
+  <div class="farm-meta"><span id="farmSeason"></span><span id="farmCoins"></span></div>
+  <div class="farm-grid" id="plots"></div>
+  <div class="seed-panel"><div class="seed-title">SEED STOCK · 种子袋</div><div class="seed-picker" id="seedPick"></div><div style="font-size:9px;color:#928c80;margin-top:10px;letter-spacing:.5px;">先选种子，再轻触一块空地。</div></div>
+  <div class="btns"><button class="act ghost" onclick="G.advance(1)">过一天</button><button class="act ghost" onclick="G.advance(3)">过三天</button></div>
+  <div class="farm-stamp">GROW WITH TIME</div>
+</div></section>
+<section id="shopPage"><div class="kitchen-scene"><div class="kitchen-window"></div><div class="kitchen-shelf"><i class="kitchen-jar j1"></i><i class="kitchen-jar j2"></i><i class="kitchen-jar j3"></i></div><div class="kitchen-pot"></div><div class="kitchen-caption">杂货铺</div></div>
+  <div class="kitchen-grid" id="shopList"></div><h2>小 票</h2><div class="card" id="receiptBox"></div></section>
+<section id="kitchenPage"><div class="kitchen-scene"><div class="kitchen-window"></div><div class="kitchen-shelf"><i class="kitchen-jar j1"></i><i class="kitchen-jar j2"></i><i class="kitchen-jar j3"></i></div><div class="kitchen-pot"></div><div class="kitchen-caption">KITCHEN · 今日料理</div></div>
+  <div class="kitchen-grid" id="recipeList"></div></section>
+<section id="bag">
+  <h2>仓 库</h2><div class="card" id="storageBox"></div>
+  <h2>调 料</h2><div class="card" id="pantryBox"></div>
+  <h2>饮 料</h2><div class="card" id="drinkBox"></div>
+  <h2>厨 具</h2><div class="card" id="utensilBox"></div>
+  <h2>做好的菜</h2><div class="card" id="dishBox"></div>
+</section>
+<section id="together">
+  <h2>一 起</h2>
+  <div class="card tg">
+    <div class="tg-sub" id="tgLabel">今天想一起做什么？</div>
+    <div class="tg-time" id="tgTime">25:00</div>
+    <div class="tg-sub" id="tgSub">每一起待 25 分钟，每个人各得 10 金</div>
+    <div id="tgPick">
+      <div class="chips" id="tgChips"><button class="on">学习</button><button>写作业</button><button>看书</button><button>画画</button><button>写代码</button></div>
+      <input class="note" id="tgNote" placeholder="或者自己写一个…" maxlength="20"> <select class="mins" id="tgMins"><option>15</option><option selected>25</option><option>45</option><option>60</option></select> 分钟
+    </div>
+    <div class="btns" style="justify-content:center"><button class="act" id="tgGo">开始</button></div>
+  </div>
+  <div class="card" id="tgLog"></div>
+</section>
+<section id="ai">
+  <h2>和 AI 一起</h2>
+  <div class="card" style="padding:12px 14px">
+    <div class="meta" style="margin-bottom:8px">你的 AI 是院子里的第二个玩家，有自己的金币、种子和仓库。<br>① 点「写给 AI」，把院子今天的样子复制给它；② 它会回你几句话，里面带着 / 开头的动作；③ 把它的回复整段贴到下面，点「让它动手」。</div>
+    <div class="btns" style="margin-bottom:8px"><input class="note" id="aiName" placeholder="给你的 AI 起个名字" maxlength="12" style="flex:1"><button class="act ghost" id="aiNameGo">好了</button></div>
+    <div class="btns"><button class="act" id="aiLetterGo">写给 AI</button></div>
+    <textarea id="aiBox" style="width:100%;min-height:110px;box-sizing:border-box" spellcheck="false" placeholder="把 AI 的回复贴在这里"></textarea>
+    <div class="btns"><button class="act" id="aiRunGo">让它动手</button><button class="act ghost" onclick="document.getElementById('aiBox').value=''">清空</button></div>
+  </div>
+  <div class="card" id="aiSaid"></div>
+</section>
+<section id="save">
+  <h2>存 档</h2>
+  <div class="card" style="padding:12px 14px">
+    <div class="meta" style="margin-bottom:8px">存档自动保存在这个浏览器里。换手机、换浏览器前记得「导出」或「下载成文件」留一份。平时和 AI 一起玩去「AI」那页。</div>
+    <textarea id="io" spellcheck="false"></textarea>
+    <div class="btns"><button class="act" onclick="exportSave()">导出</button><button class="act ghost" onclick="importSave()">导入</button><button class="act ghost" onclick="downloadSave()">下载成文件</button><button class="act ghost" onclick="resetSave()">重新开始</button></div>
+  </div>
+</section>
+</div>
+<nav><button class="on" data-tab="farmPage">农场</button><button data-tab="shopPage">商店</button><button data-tab="kitchenPage">厨房</button><button data-tab="bag">背包</button><button data-tab="together">一起</button><button data-tab="ai">AI</button><button data-tab="save">存档</button></nav>
+
+<script>
+/* ===== 规则（由 tools/build-single.js 从 catalog.json 和 state.json 生成，改规则请改那两个文件再重新生成）===== */
+var CATALOG = {
+  "_readme": "开源模板文件：这是示例规则，可自由替换、删除或新增，不含任何真实数据。",
+  "meta": {"title":"我的小院子","days_per_season":28,"seasons":["spring","summer","autumn","winter"],"season_names":{"spring":"春","summer":"夏","autumn":"秋","winter":"冬"},"plot_count":6,"start_coins":100},
+  "crops": {
+    "pea":{"name":"豌豆","season":"spring","grow_days":3,"value":15,"seed_price":8},
+    "tomato":{"name":"番茄","season":"summer","grow_days":4,"value":25,"seed_price":11},
+    "corn":{"name":"玉米","season":"summer","grow_days":5,"value":30,"seed_price":14},
+    "sunflower":{"name":"向日葵","season":"summer","grow_days":4,"value":22,"seed_price":10,"flower":true},
+    "pumpkin":{"name":"南瓜","season":"autumn","grow_days":5,"value":35,"seed_price":16},
+    "cabbage":{"name":"卷心菜","season":"autumn","grow_days":4,"value":20,"seed_price":9},
+    "narcissus":{"name":"水仙","season":"winter","grow_days":3,"value":30,"seed_price":14,"flower":true}
+  },
+  "supplies": {
+    "salt":{"name":"盐","price":8,"portions":3},
+    "sugar":{"name":"糖","price":10,"portions":3},
+    "cooking_oil":{"name":"食用油","price":14,"portions":3}
+  },
+  "drinks": {
+    "soda":{"name":"苏打水","price":8,"amount":2},
+    "lemon_tea":{"name":"柠檬茶","price":12,"amount":2}
+  },
+  "utensils": {
+    "plate":{"name":"白瓷盘","price":28},
+    "frying_pan":{"name":"平底锅","price":68},
+    "soup_pot":{"name":"汤锅","price":72}
+  },
+  "recipes": {
+    "pea_saute":{"name":"清炒豌豆","crops":{"pea":2},"supplies":{"salt":1},"utensils":["frying_pan","plate"]},
+    "tomato_salad":{"name":"凉拌番茄","crops":{"tomato":1},"supplies":{"sugar":1},"utensils":["plate"]},
+    "corn_soup":{"name":"玉米浓汤","crops":{"corn":2},"supplies":{"salt":1},"utensils":["soup_pot","plate"]}
+  }
+};
+var FRESH_STATE = {
+  "_readme": "开源模板示例存档：可以清空后重新开始，不含真实数据。",
+  "meta": {
+    "day": 1
+  },
+  "players": [
+    {
+      "id": "user",
+      "name": "玩家",
+      "coins": 100,
+      "seeds": {},
+      "storage": [],
+      "pantry": {},
+      "drinks": {},
+      "utensils": [],
+      "dishes": []
+    }
+  ],
+  "plots": [
+    {
+      "id": 1,
+      "item": null,
+      "planted_day": null,
+      "by": null
+    },
+    {
+      "id": 2,
+      "item": null,
+      "planted_day": null,
+      "by": null
+    },
+    {
+      "id": 3,
+      "item": null,
+      "planted_day": null,
+      "by": null
+    },
+    {
+      "id": 4,
+      "item": null,
+      "planted_day": null,
+      "by": null
+    },
+    {
+      "id": 5,
+      "item": null,
+      "planted_day": null,
+      "by": null
+    },
+    {
+      "id": 6,
+      "item": null,
+      "planted_day": null,
+      "by": null
+    }
+  ],
+  "log": [
+    {
+      "day": 1,
+      "actor": "系统",
+      "text": "新的小院子开始了"
+    }
+  ]
+};
+</script>
+<script>
+/* ===== 引擎：跟 engine.js 同一套规则，只是存档放在浏览器 localStorage ===== */
+var KEY = 'slowgarden-save';
+var state;
+try { state = JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { state = null; }
+if (!state) state = JSON.parse(JSON.stringify(FRESH_STATE));
+function ks(o){ return Object.keys(o || {}).filter(function(k){ return k[0] !== '_'; }); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function player(id){ return state.players.find(function(p){ return p.id === id || p.name === id; }); }
+function seasonOf(day){ var m = CATALOG.meta; return m.seasons[Math.floor((day - 1) / m.days_per_season) % m.seasons.length]; }
+function count(list, id){ var r = (list || []).find(function(x){ return x.item === id; }); return r ? r.count : 0; }
+function add(list, id, n){ var r = list.find(function(x){ return x.item === id; }); if (!r && n > 0) { list.push({ item: id, count: n }); return; } if (!r) return; r.count += n; if (r.count <= 0) list.splice(list.indexOf(r), 1); }
+function log(actor, text){ state.log = state.log || []; state.log.push({ day: state.meta.day, actor: actor, text: text }); state.log = state.log.slice(-200); }
+function res(ok, message){ return { ok: ok, message: message }; }
+function validate(){
+  var e = [], m = CATALOG.meta;
+  ks(CATALOG.crops).forEach(function(id){ var c = CATALOG.crops[id]; if (m.seasons.indexOf(c.season) < 0) e.push('作物 ' + id + ' 的 season 无效'); if (!(c.grow_days > 0)) e.push('作物 ' + id + ' 的 grow_days 必须大于 0'); });
+  ks(CATALOG.recipes).forEach(function(id){ var r = CATALOG.recipes[id];
+    ks(r.crops).forEach(function(x){ if (!CATALOG.crops[x]) e.push('菜谱 ' + id + ' 用了不存在的作物 ' + x); });
+    ks(r.supplies).forEach(function(x){ if (!CATALOG.supplies[x]) e.push('菜谱 ' + id + ' 用了不存在的调料 ' + x); });
+    (r.utensils || []).forEach(function(x){ if (!CATALOG.utensils[x]) e.push('菜谱 ' + id + ' 用了不存在的厨具 ' + x); }); });
+  return e;
+}
+var G = {
+  buy: function(itemId){ var p = me(), item;
+    ks(CATALOG.crops).forEach(function(k){ var c = CATALOG.crops[k]; if ('seed_' + k === itemId) item = { type: 'seed', ref: k, price: c.seed_price, name: c.name + '种子' }; });
+    if (!item && CATALOG.supplies[itemId]) item = { type: 'supply', ref: itemId, price: CATALOG.supplies[itemId].price, name: CATALOG.supplies[itemId].name };
+    if (!item && (CATALOG.drinks || {})[itemId]) item = { type: 'drink', ref: itemId, price: CATALOG.drinks[itemId].price, name: CATALOG.drinks[itemId].name };
+    if (!item && CATALOG.utensils[itemId]) item = { type: 'utensil', ref: itemId, price: CATALOG.utensils[itemId].price, name: CATALOG.utensils[itemId].name };
+    if (!item) return done(res(false, '货架上没有这个'));
+    if (item.type === 'utensil' && p.utensils.indexOf(item.ref) >= 0) return done(res(false, '已经有' + item.name + '了'));
+    if (p.coins < item.price) return done(res(false, '金币不够'));
+    p.coins -= item.price;
+    if (item.type === 'seed') p.seeds[item.ref] = (p.seeds[item.ref] || 0) + 1;
+    if (item.type === 'supply') p.pantry[item.ref] = (p.pantry[item.ref] || 0) + (CATALOG.supplies[item.ref].portions || 1);
+    if (item.type === 'drink') p.drinks[item.ref] = (p.drinks[item.ref] || 0) + (CATALOG.drinks[item.ref].amount || 1);
+    if (item.type === 'utensil') p.utensils.push(item.ref);
+    // 每次购买都开一张小票（我们自己家踩过：有的购买路径忘了开票，后来补上的）
+    state.receipts = state.receipts || []; state.receipts.push({ day: state.meta.day, who: p.name, item: item.name, price: item.price, balance: p.coins }); state.receipts = state.receipts.slice(-100);
+    log(p.name, '买了 ' + item.name); return done(res(true, '买下 ' + item.name + '，花了 ' + item.price + ' 金')); },
+  plant: function(plotId, crop){ var p = me(), ck = crop || picked, pl = state.plots.find(function(x){ return String(x.id) === String(plotId); }), c = CATALOG.crops[ck];
+    if (!ck || !c) return done(res(false, '先在下面选一样种子'));
+    if (!pl || pl.item) return done(res(false, '这块地种不了'));
+    if (c.season !== seasonOf(state.meta.day)) return done(res(false, '现在不是' + c.name + '的季节'));
+    if ((p.seeds[ck] || 0) < 1) return done(res(false, '没有这种种子了'));
+    p.seeds[ck]--; pl.item = ck; pl.planted_day = state.meta.day; pl.by = p.id; log(p.name, '种下 ' + c.name); return done(res(true, '种下了 ' + c.name)); },
+  harvest: function(plotId){ var pl = state.plots.find(function(x){ return String(x.id) === String(plotId); });
+    if (!pl || !pl.item) return done(res(false, '地是空的'));
+    var c = CATALOG.crops[pl.item], age = state.meta.day - pl.planted_day;
+    if (age < c.grow_days) return done(res(false, '还要 ' + (c.grow_days - age) + ' 天'));
+    var p = player(pl.by) || me(); add(p.storage, pl.item, 1); log(p.name, '收了 ' + c.name);
+    pl.item = null; pl.planted_day = null; pl.by = null; return done(res(true, '收获 ' + c.name)); },
+  sell: function(cropId){ var p = me(), c = CATALOG.crops[cropId];
+    if (!c || count(p.storage, cropId) < 1) return done(res(false, '仓库里没有'));
+    add(p.storage, cropId, -1); p.coins += c.value; log(p.name, '卖了 ' + c.name); return done(res(true, '卖了 ' + c.value + ' 金')); },
+  cook: function(recipeId){ var p = me(), r = CATALOG.recipes[recipeId], k;
+    for (k of ks(r.crops)) if (count(p.storage, k) < r.crops[k]) return done(res(false, '作物不够'));
+    for (k of ks(r.supplies)) if ((p.pantry[k] || 0) < r.supplies[k]) return done(res(false, '调料不够'));
+    for (k of (r.utensils || [])) if (p.utensils.indexOf(k) < 0) return done(res(false, '缺厨具'));
+    ks(r.crops).forEach(function(x){ add(p.storage, x, -r.crops[x]); }); ks(r.supplies).forEach(function(x){ p.pantry[x] -= r.supplies[x]; });
+    add(p.dishes, recipeId, 1); log(p.name, '做了 ' + r.name); return done(res(true, '做好了 ' + r.name)); },
+  advance: function(n){ state.meta.day += n; return done(res(true, '过了 ' + n + ' 天')); }
+};
+var ACT = null; // AI 动手时临时换成 AI 那个玩家
+function me(){ return ACT || state.players[0]; }
+function done(r){ save(); toast(r.message); render(); return r; }
+function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 1800); }
+function cropName(id){ return (CATALOG.crops[id] || {}).name || id; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var picked = null;
+
+/* ===== 界面 ===== */
+function render(){
+  var m = CATALOG.meta, p = state.players[0], cur = seasonOf(state.meta.day);
+  document.getElementById('title').textContent = m.title || 'slowgarden';
+  document.getElementById('barDay').textContent = '第 ' + state.meta.day + ' 天';
+  document.getElementById('barSeason').textContent = (m.season_names || {})[cur] + '季';
+  document.getElementById('barCoins').textContent = state.players.map(function(x){ return x.name + ' ' + x.coins + ' 金'; }).join(' · ');
+  var v = validate(); document.getElementById('warnBox').innerHTML = v.length ? '<div class="warn">规则有问题：' + v.map(esc).join('；') + '</div>' : '';
+  document.getElementById('farmTitle').textContent = m.title || '我的小院子';
+  document.getElementById('farmSeason').textContent = (m.season_names || {})[cur] + '季 · 第 ' + state.meta.day + ' 天';
+  document.getElementById('farmCoins').textContent = p.coins + ' 金';
+  var plantArt = '<div class="plant-art"><i class="plant-stem"></i><i class="plant-leaf l1"></i><i class="plant-leaf l2"></i><i class="plant-leaf l3"></i><span class="plant-bloom"><i></i><i></i><i></i><i></i><i></i></span></div>';
+  document.getElementById('plots').innerHTML = state.plots.map(function(pl){
+    if (!pl.item) return '<div class="farm-plot empty" onclick="G.plant(' + JSON.stringify(pl.id) + ')"><div class="plot-copy"><div class="plot-name">空地</div><div class="plot-status">等待播种</div></div></div>';
+    var c = CATALOG.crops[pl.item] || {}, age = state.meta.day - pl.planted_day, ok = age >= (c.grow_days || 1);
+    return '<div class="farm-plot plant-' + esc(pl.item) + (ok ? ' mature harvest-btn' : ' growing') + '" onclick="G.harvest(' + JSON.stringify(pl.id) + ')">' + plantArt + '<div class="plot-copy"><div class="plot-name">' + esc(c.name) + '</div><div class="plot-status">' + (ok ? '可收获' : age + '/' + c.grow_days + '天') + '</div></div></div>'; }).join('');
+  var seeds = ks(p.seeds).filter(function(k){ return p.seeds[k] > 0; });
+  document.getElementById('seedPick').innerHTML = seeds.length ? seeds.map(function(k){ return '<span class="seed-choice' + (picked === k ? ' active' : '') + '" onclick="picked=' + esc(JSON.stringify(k)) + ';render()">' + esc(cropName(k)) + ' ×' + p.seeds[k] + '</span>'; }).join('') : '<div style="font-size:11px;color:#928c80">种子袋空了，先去杂货铺买些种子吧</div>';
+  var rows = [];
+  ks(CATALOG.crops).forEach(function(k){ var c = CATALOG.crops[k]; if (typeof c.seed_price === 'number') rows.push({ icon: 'seed', id: 'seed_' + k, name: c.name + '种子', meta: (m.season_names || {})[c.season] + '季 · ' + c.grow_days + ' 天 · 卖 ' + c.value + ' 金' + (c.season !== cur ? ' · 不在季' : ''), price: c.seed_price }); });
+  ks(CATALOG.supplies).forEach(function(k){ var s = CATALOG.supplies[k]; rows.push({ icon: 'ingredient', id: k, name: s.name, meta: '调料 · 一份 ' + s.portions + ' 次', price: s.price }); });
+  ks(CATALOG.drinks).forEach(function(k){ var d = CATALOG.drinks[k]; rows.push({ icon: 'ingredient', id: k, name: d.name, meta: '饮料 · ' + d.amount + ' 瓶', price: d.price }); });
+  ks(CATALOG.utensils).forEach(function(k){ var u = CATALOG.utensils[k]; rows.push({ icon: 'utensil', id: k, name: u.name, meta: '厨具', price: u.price }); });
+  document.getElementById('shopList').innerHTML = rows.map(function(r){ return '<div class="kitchen-card"><div class="kitchen-icon ' + r.icon + '"></div><div class="k-name">' + esc(r.name) + '</div><div class="k-meta">' + esc(r.meta) + '<br>' + r.price + ' 金</div><button class="kitchen-action" onclick="G.buy(' + esc(JSON.stringify(r.id)) + ')">买一份</button></div>'; }).join('');
+  var rc = (state.receipts || []).slice().reverse().slice(0, 10);
+  document.getElementById('receiptBox').innerHTML = rc.length ? rc.map(function(r){ return '<div class="row"><div class="info"><div class="name">' + esc(r.item) + '</div><div class="meta">第 ' + r.day + ' 天 · ' + esc(r.who) + ' · 剩 ' + r.balance + ' 金</div></div><span class="meta">-' + r.price + '</span></div>'; }).join('') : '<div class="empty">还没买过东西</div>';
+  document.getElementById('recipeList').innerHTML = ks(CATALOG.recipes).map(function(k){ var r = CATALOG.recipes[k];
+    var need = [].concat(ks(r.crops).map(function(x){ return cropName(x) + '×' + r.crops[x]; }), ks(r.supplies).map(function(x){ return (CATALOG.supplies[x] || {}).name + '×' + r.supplies[x]; }), (r.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name; })).join('、');
+    return '<div class="kitchen-card"><div class="kitchen-icon dish"></div><div class="k-name">' + esc(r.name) + '</div><div class="k-meta">' + esc(need) + '</div><button class="kitchen-action" onclick="G.cook(' + esc(JSON.stringify(k)) + ')">做这道</button></div>'; }).join('');
+  var st = p.storage || [];
+  document.getElementById('storageBox').innerHTML = st.length ? st.map(function(x){ return '<div class="row"><div class="info"><div class="name">' + esc(cropName(x.item)) + '</div><div class="meta">×' + x.count + ' · 一个卖 ' + ((CATALOG.crops[x.item] || {}).value || 0) + ' 金</div></div><button class="act ghost" onclick="G.sell(' + esc(JSON.stringify(x.item)) + ')">卖一个</button></div>'; }).join('') : '<div class="empty">仓库空的</div>';
+  function box(o, nm){ var k = ks(o).filter(function(x){ return o[x] > 0; }); return k.length ? k.map(function(x){ return '<div class="row"><div class="name">' + esc(nm(x)) + '</div><span class="meta">×' + o[x] + '</span></div>'; }).join('') : '<div class="empty">空</div>'; }
+  document.getElementById('pantryBox').innerHTML = box(p.pantry, function(x){ return (CATALOG.supplies[x] || {}).name || x; });
+  document.getElementById('drinkBox').innerHTML = box(p.drinks, function(x){ return ((CATALOG.drinks || {})[x] || {}).name || x; });
+  document.getElementById('utensilBox').innerHTML = (p.utensils || []).length ? p.utensils.map(function(x){ return '<div class="row"><div class="name">' + esc((CATALOG.utensils[x] || {}).name || x) + '</div></div>'; }).join('') : '<div class="empty">空</div>';
+  document.getElementById('dishBox').innerHTML = (p.dishes || []).length ? p.dishes.map(function(x){ return '<div class="row"><div class="name">' + esc((CATALOG.recipes[x.item] || {}).name || x.item) + '</div><span class="meta">×' + x.count + '</span></div>'; }).join('') : '<div class="empty">还没做菜</div>';
+  renderTogether(); renderAI();
+}
+
+/* ===== 一起：陪伴计时（来自安与霁家里的「一起」房间）。结束时每个玩家都拿金币——两个人一起待着，两个人都有份 ===== */
+var tgWhat = '学习', tgTimer = null;
+function renderTogether(){
+  var a = state.together, go = document.getElementById('tgGo'), lg = state.together_log || [];
+  document.getElementById('tgPick').style.display = a ? 'none' : '';
+  go.textContent = a ? '结束' : '开始';
+  document.getElementById('tgLog').innerHTML = lg.length ? lg.slice().reverse().slice(0, 10).map(function(h){ return '<div class="row"><div class="info"><div class="name">' + esc(h.what) + '</div><div class="meta">' + esc(h.date) + ' · ' + h.minutes + ' 分钟</div></div><span class="meta">每人 +' + h.coins + '</span></div>'; }).join('') : '<div class="empty">还没一起待过。给你的 AI 也看看这一页吧</div>';
+  clearInterval(tgTimer);
+  if (a) { tick(); tgTimer = setInterval(tick, 1000); } else { document.getElementById('tgTime').textContent = String(+document.getElementById('tgMins').value).padStart(2, '0') + ':00'; document.getElementById('tgLabel').textContent = '今天想一起做什么？'; }
+}
+function tick(){ var a = state.together; if (!a) return;
+  var el = (Date.now() - a.start) / 1000, left = a.minutes * 60 - el;
+  document.getElementById('tgLabel').textContent = '一起' + a.what;
+  document.getElementById('tgTime').textContent = left > 0 ? String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(Math.floor(left % 60)).padStart(2, '0') : '时间到';
+  if (left <= 0) stopTogether(); }
+function stopTogether(){ var a = state.together; if (!a) return;
+  var min = Math.floor((Date.now() - a.start) / 60000), coins = Math.floor(min * 10 / 25);
+  state.players.forEach(function(p){ p.coins += coins; });
+  state.together_log = state.together_log || []; state.together_log.push({ what: a.what, minutes: min, coins: coins, date: new Date().toLocaleDateString() });
+  state.together = null; done(res(true, '一起了 ' + min + ' 分钟，每人得 ' + coins + ' 金')); }
+document.getElementById('tgChips').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; tgWhat = b.textContent; document.getElementById('tgNote').value = ''; [].forEach.call(this.children, function(x){ x.classList.toggle('on', x === b); }); });
+document.getElementById('tgMins').onchange = renderTogether;
+document.getElementById('tgGo').onclick = function(){
+  if (state.together) return stopTogether();
+  state.together = { what: (document.getElementById('tgNote').value || '').trim() || tgWhat, minutes: +document.getElementById('tgMins').value, start: Date.now() };
+  save(); renderTogether(); };
+
+/* ===== 和 AI 一起：AI 是第二个玩家。写一封信给它，它回话里用 / 开头的行下动作 ===== */
+function aiPlayer(){ return state.players.find(function(x){ return x.id === 'ai'; }); }
+function ensureAI(name){ var a = aiPlayer();
+  if (!a) { a = { id: 'ai', name: name || 'AI', coins: CATALOG.meta.start_coins || 100, seeds: {}, storage: [], pantry: {}, drinks: {}, utensils: [], dishes: [] }; state.players.push(a); }
+  else if (name) a.name = name;
+  return a; }
+function findId(group, word){ word = String(word || '').trim(); var hit = null;
+  ks(group).forEach(function(k){ if (k === word || group[k].name === word) hit = k; }); return hit; }
+function listStr(arr, nm){ return (arr || []).length ? arr.map(function(x){ return nm(x.item) + '×' + x.count; }).join('、') : '没有'; }
+function objStr(o, nm){ var k = ks(o).filter(function(x){ return o[x] > 0; }); return k.length ? k.map(function(x){ return nm(x) + '×' + o[x]; }).join('、') : '没有'; }
+function aiLetter(){ var a = ensureAI(), u = state.players[0], m = CATALOG.meta, cur = seasonOf(state.meta.day), sn = m.season_names || {};
+  var sup = function(x){ return (CATALOG.supplies[x] || {}).name || x; };
+  var L = [];
+  L.push('我们在玩一个叫 slowgarden 的种田小游戏，你是院子里的另一个玩家「' + a.name + '」，我是「' + u.name + '」。');
+  L.push('今天是第 ' + state.meta.day + ' 天，' + (sn[cur] || cur) + '季（每季 ' + m.days_per_season + ' 天，只有当季的种子能种）。');
+  L.push('');
+  L.push('【地】' + state.plots.map(function(pl){ if (!pl.item) return pl.id + '号空着'; var c = CATALOG.crops[pl.item] || {}, age = state.meta.day - pl.planted_day, who = (player(pl.by) || {}).name || '';
+    return pl.id + '号' + (c.name || pl.item) + (age >= c.grow_days ? '（能收了）' : '（' + age + '/' + c.grow_days + '天）') + (who ? '·' + who + '种的' : ''); }).join('；'));
+  L.push('【你】' + a.coins + ' 金；种子：' + objStr(a.seeds, cropName) + '；仓库：' + listStr(a.storage, cropName) + '；调料：' + objStr(a.pantry, sup) + '；厨具：' + ((a.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name || x; }).join('、') || '没有'));
+  L.push('【我】' + u.coins + ' 金；仓库：' + listStr(u.storage, cropName));
+  L.push('【当季种子】' + ks(CATALOG.crops).filter(function(k){ return CATALOG.crops[k].season === cur; }).map(function(k){ var c = CATALOG.crops[k]; return c.name + '种子 ' + c.seed_price + '金（' + c.grow_days + '天熟，卖' + c.value + '）'; }).join('、'));
+  L.push('【杂货】' + ks(CATALOG.supplies).map(function(k){ return CATALOG.supplies[k].name + ' ' + CATALOG.supplies[k].price + '金'; }).concat(ks(CATALOG.utensils).map(function(k){ return CATALOG.utensils[k].name + ' ' + CATALOG.utensils[k].price + '金'; })).join('、'));
+  L.push('【菜谱】' + ks(CATALOG.recipes).map(function(k){ var r = CATALOG.recipes[k];
+    return r.name + '（' + [].concat(ks(r.crops).map(function(x){ return cropName(x) + '×' + r.crops[x]; }), ks(r.supplies).map(function(x){ return sup(x) + '×' + r.supplies[x]; }), (r.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name; })).join('、') + '）'; }).join('；'));
+  var lg = (state.log || []).slice(-6); if (lg.length) L.push('【最近】' + lg.map(function(x){ return '第' + x.day + '天 ' + x.actor + ' ' + x.text; }).join('；'));
+  L.push('');
+  L.push('你想说什么就直接说，想做什么就单独起一行、用 / 开头写动作（可以写好几行）：');
+  L.push('/买 番茄种子 2　　/种 番茄 3（3 是地的编号）　　/收 3　　/卖 番茄 1　　/做 菜名　　/送 番茄 1（送给我）');
+  L.push('过天由我来点。钱和东西是你自己的，怎么花你决定。');
+  return L.join('\n'); }
+function aiRun(text){ var a = ensureAI(), out = [], said = [];
+  ACT = a;
+  try { String(text || '').split(/\n/).forEach(function(line){ var t = line.trim(); if (!t) return;
+    if (!/^[\/／]/.test(t)) { said.push(t); return; }
+    var w = t.replace(/^[\/／]\s*/, '').split(/\s+/), cmd = w[0], x = w[1], n = Math.max(1, Math.min(20, parseInt(w[2], 10) || 1)), r;
+    var one = function(f){ var ok = 0; for (var i = 0; i < n; i++) { r = f(); if (!r.ok) break; ok++; } out.push(t + ' → ' + r.message + (ok > 1 ? '（共 ' + ok + ' 次）' : '')); };
+    if (cmd === '买') { var id = findId(CATALOG.supplies, x) || findId(CATALOG.utensils, x) || findId(CATALOG.drinks || {}, x), cid = findId(CATALOG.crops, String(x || '').replace(/种子$/, ''));
+      if (!id && cid) id = 'seed_' + cid; if (!id) return out.push(t + ' → 货架上没有「' + x + '」'); one(function(){ return G.buy(id); }); }
+    else if (cmd === '种') { var c = findId(CATALOG.crops, x); if (!c) return out.push(t + ' → 不认识「' + x + '」'); r = G.plant(w[2], c); out.push(t + ' → ' + r.message); }
+    else if (cmd === '收') { r = G.harvest(x); out.push(t + ' → ' + r.message); }
+    else if (cmd === '卖') { var s = findId(CATALOG.crops, x); if (!s) return out.push(t + ' → 不认识「' + x + '」'); one(function(){ return G.sell(s); }); }
+    else if (cmd === '做') { var k = findId(CATALOG.recipes, x); if (!k) return out.push(t + ' → 没有这道菜'); r = G.cook(k); out.push(t + ' → ' + r.message); }
+    else if (cmd === '送') { var g = findId(CATALOG.crops, x); if (!g) return out.push(t + ' → 不认识「' + x + '」');
+      var have = count(a.storage, g), k2 = Math.min(have, n); if (k2 < 1) return out.push(t + ' → 仓库里没有');
+      add(a.storage, g, -k2); add(state.players[0].storage, g, k2); log(a.name, '送了 ' + cropName(g) + '×' + k2 + ' 给 ' + state.players[0].name); out.push(t + ' → 送出 ' + cropName(g) + '×' + k2); }
+    else out.push(t + ' → 看不懂这个动作'); }); }
+  finally { ACT = null; }
+  if (said.length) { state.ai_said = { day: state.meta.day, text: said.join('\n').slice(0, 600) }; log(a.name, '说了话'); }
+  state.ai_last = out; done(res(true, out.length ? a.name + ' 做了 ' + out.length + ' 件事' : a.name + ' 说完了')); }
+function renderAI(){ var a = aiPlayer(), el = document.getElementById('aiSaid'); if (!el) return;
+  document.getElementById('aiName').value = a ? a.name : '';
+  var h = '';
+  if (state.ai_said) h += '<div class="row"><div class="info"><div class="name">' + esc(a ? a.name : 'AI') + ' 说</div><div class="meta" style="white-space:pre-wrap">' + esc(state.ai_said.text) + '</div></div></div>';
+  (state.ai_last || []).forEach(function(x){ h += '<div class="row"><div class="meta">' + esc(x) + '</div></div>'; });
+  el.innerHTML = h || '<div class="empty">' + (a ? a.name + ' 还没来过。点「写给 AI」叫它' : '先给你的 AI 起个名字吧') + '</div>'; }
+document.getElementById('aiNameGo').onclick = function(){ var n = document.getElementById('aiName').value.trim(); ensureAI(n); done(res(true, (n || 'AI') + ' 住进院子了')); };
+document.getElementById('aiLetterGo').onclick = function(){ var t = aiLetter(); save(); document.getElementById('aiBox').value = t;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ toast('复制好了，发给你的 AI'); }, function(){ document.getElementById('aiBox').select(); toast('框里这段全选复制，发给你的 AI'); }); render(); };
+document.getElementById('aiRunGo').onclick = function(){ var t = document.getElementById('aiBox').value; if (!t.trim()) return toast('先把 AI 的回复贴进来');
+  if (/^我们在玩一个叫 slowgarden/.test(t.trim())) return toast('这是写给 AI 的信，要贴它回你的话'); aiRun(t); document.getElementById('aiBox').value = ''; };
+
+/* ===== 存档：导出 / 导入 ===== */
+function exportSave(){ document.getElementById('io').value = JSON.stringify(state, null, 2); toast('已经放进下面的框里，全选复制给 AI 就行'); }
+function importSave(){ try { var s = JSON.parse(document.getElementById('io').value); if (!s.players || !s.plots) throw 0; state = s; done(res(true, '导入好了')); } catch (e) { toast('这段不是 slowgarden 的存档'); } }
+function downloadSave(){ var b = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'slowgarden-state.json'; a.click(); }
+function resetSave(){ if (!confirm('清空存档从头开始？')) return; state = JSON.parse(JSON.stringify(FRESH_STATE)); done(res(true, '重新开始了')); }
+
+document.querySelectorAll('nav button').forEach(function(b){ b.onclick = function(){ var t = b.getAttribute('data-tab');
+  document.querySelectorAll('nav button').forEach(function(x){ x.classList.toggle('on', x === b); });
+  document.querySelectorAll('section').forEach(function(s){ s.classList.toggle('on', s.id === t); }); }; });
+render();
+</script>
+</body>
+</html>
