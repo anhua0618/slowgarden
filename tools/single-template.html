@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>slowgarden · 单文件版</title>
+<style>
+/* 单文件版：双击就能玩，存档放在浏览器里，也能导出给 AI 看。
+   样式照「素」的方向：浅纸色、细线、圆角，不要渐变。改颜色只动 :root 这几行 */
+:root{--paper:#faf8f3;--base:#f1ede4;--line:#e2dccf;--ink:#3f423b;--muted:#8b867a;--accent:#5f7a5a;--soft:#e7eee2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--base);color:var(--ink);font-family:system-ui,-apple-system,"PingFang SC","Segoe UI",sans-serif;font-size:14px}
+.wrap{max-width:520px;margin:0 auto;padding:18px 16px 90px}
+header{padding:18px 18px 14px;border:1px solid var(--line);border-radius:18px;background:var(--paper);margin-bottom:14px}
+h1{margin:0 0 6px;font-size:20px;font-weight:500;letter-spacing:2px}
+.bar{font-size:12px;color:var(--muted);letter-spacing:1px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;background:var(--paper);border-top:1px solid var(--line);z-index:10;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;max-width:104px;border:0;background:none;padding:13px 4px;font:13px inherit;letter-spacing:2px;color:var(--muted);cursor:pointer}
+nav button.on{color:var(--ink);font-weight:600}
+section{display:none}section.on{display:block}
+h2{font-size:12px;font-weight:500;letter-spacing:3px;color:var(--muted);margin:18px 2px 8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.plot{aspect-ratio:1;border-radius:14px;border:1px dashed #cfc6b3;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;cursor:pointer;padding:6px;text-align:center;gap:3px}
+.plot strong{font-weight:500}.plot small{font-size:10px;color:var(--muted)}
+.plot.ready{border-style:solid;border-color:var(--accent);background:var(--soft)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:4px 14px;margin-bottom:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.info{flex:1}.name{font-size:14px}.meta{font-size:11px;color:var(--muted);margin-top:2px}
+button.act{border:0;border-radius:999px;padding:7px 16px;background:var(--accent);color:#fff;font:12px inherit;cursor:pointer}
+button.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.empty{color:var(--muted);font-size:12px;padding:12px 0}
+.seedbtn{display:inline-block;margin:4px 4px 0 0;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;cursor:pointer}
+.seedbtn.on{border-color:var(--accent);background:var(--soft)}
+.warn{border:1px solid #efc9bd;background:#fff6f2;color:#9a4a3a;border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:10px}
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:rgba(50,50,46,.9);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;z-index:50;opacity:0;transition:.25s;pointer-events:none;max-width:88%}
+#toast.show{opacity:1}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+/* 一起 */
+.tg{text-align:center;padding:14px 0}
+.tg-time{font-size:44px;font-weight:300;letter-spacing:2px;font-variant-numeric:tabular-nums;margin:6px 0}
+.tg-sub{font-size:12px;color:var(--muted);letter-spacing:1px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:12px 0}
+.chips button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 14px;font:12px inherit;color:var(--muted);cursor:pointer}
+.chips button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+input.note,select.mins{border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff;font:14px inherit;text-align:center}
+textarea#io{width:100%;height:160px;border:1px solid var(--line);border-radius:12px;padding:10px;font:12px ui-monospace,monospace;background:#fff}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="wrap">
+<header><h1 id="title">slowgarden</h1><div class="bar"><span id="barDay"></span> · <span id="barSeason"></span> · <span id="barCoins"></span></div></header>
+<div id="warnBox"></div>
+
+<section id="farm" class="on">
+  <h2>田 地</h2><div class="grid" id="plots"></div>
+  <div class="card" id="seedPick" style="margin-top:10px;padding:12px 14px"></div>
+  <div class="btns"><button class="act ghost" onclick="G.advance(1)">过一天</button><button class="act ghost" onclick="G.advance(3)">过三天</button></div>
+</section>
+<section id="shop"><h2>商 店</h2><div id="shopList"></div><h2>小 票</h2><div class="card" id="receiptBox"></div></section>
+<section id="kitchen"><h2>厨 房</h2><div id="recipeList"></div></section>
+<section id="bag">
+  <h2>仓 库</h2><div class="card" id="storageBox"></div>
+  <h2>调 料</h2><div class="card" id="pantryBox"></div>
+  <h2>饮 料</h2><div class="card" id="drinkBox"></div>
+  <h2>厨 具</h2><div class="card" id="utensilBox"></div>
+  <h2>做好的菜</h2><div class="card" id="dishBox"></div>
+</section>
+<section id="together">
+  <h2>一 起</h2>
+  <div class="card tg">
+    <div class="tg-sub" id="tgLabel">今天想一起做什么？</div>
+    <div class="tg-time" id="tgTime">25:00</div>
+    <div class="tg-sub" id="tgSub">每一起待 25 分钟，每个人各得 10 金</div>
+    <div id="tgPick">
+      <div class="chips" id="tgChips"><button class="on">学习</button><button>写作业</button><button>看书</button><button>画画</button><button>写代码</button></div>
+      <input class="note" id="tgNote" placeholder="或者自己写一个…" maxlength="20"> <select class="mins" id="tgMins"><option>15</option><option selected>25</option><option>45</option><option>60</option></select> 分钟
+    </div>
+    <div class="btns" style="justify-content:center"><button class="act" id="tgGo">开始</button></div>
+  </div>
+  <div class="card" id="tgLog"></div>
+</section>
+<section id="save">
+  <h2>存 档</h2>
+  <div class="card" style="padding:12px 14px">
+    <div class="meta" style="margin-bottom:8px">存档自动保存在这个浏览器里。想让 AI 看看或者帮你改，就「导出」复制给它；它改完把新的 JSON 贴回来点「导入」。</div>
+    <textarea id="io" spellcheck="false"></textarea>
+    <div class="btns"><button class="act" onclick="exportSave()">导出</button><button class="act ghost" onclick="importSave()">导入</button><button class="act ghost" onclick="downloadSave()">下载成文件</button><button class="act ghost" onclick="resetSave()">重新开始</button></div>
+  </div>
+</section>
+</div>
+<nav><button class="on" data-tab="farm">农场</button><button data-tab="shop">商店</button><button data-tab="kitchen">厨房</button><button data-tab="bag">背包</button><button data-tab="together">一起</button><button data-tab="save">存档</button></nav>
+
+<script>
+/* ===== 规则（由 tools/build-single.js 从 catalog.json 和 state.json 生成，改规则请改那两个文件再重新生成）===== */
+var CATALOG = /*CATALOG*/null;
+var FRESH_STATE = /*STATE*/null;
+</script>
+<script>
+/* ===== 引擎：跟 engine.js 同一套规则，只是存档放在浏览器 localStorage ===== */
+var KEY = 'slowgarden-save';
+var state;
+try { state = JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { state = null; }
+if (!state) state = JSON.parse(JSON.stringify(FRESH_STATE));
+function ks(o){ return Object.keys(o || {}).filter(function(k){ return k[0] !== '_'; }); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+function player(id){ return state.players.find(function(p){ return p.id === id || p.name === id; }); }
+function seasonOf(day){ var m = CATALOG.meta; return m.seasons[Math.floor((day - 1) / m.days_per_season) % m.seasons.length]; }
+function count(list, id){ var r = (list || []).find(function(x){ return x.item === id; }); return r ? r.count : 0; }
+function add(list, id, n){ var r = list.find(function(x){ return x.item === id; }); if (!r && n > 0) { list.push({ item: id, count: n }); return; } if (!r) return; r.count += n; if (r.count <= 0) list.splice(list.indexOf(r), 1); }
+function log(actor, text){ state.log = state.log || []; state.log.push({ day: state.meta.day, actor: actor, text: text }); state.log = state.log.slice(-200); }
+function res(ok, message){ return { ok: ok, message: message }; }
+function validate(){
+  var e = [], m = CATALOG.meta;
+  ks(CATALOG.crops).forEach(function(id){ var c = CATALOG.crops[id]; if (m.seasons.indexOf(c.season) < 0) e.push('作物 ' + id + ' 的 season 无效'); if (!(c.grow_days > 0)) e.push('作物 ' + id + ' 的 grow_days 必须大于 0'); });
+  ks(CATALOG.recipes).forEach(function(id){ var r = CATALOG.recipes[id];
+    ks(r.crops).forEach(function(x){ if (!CATALOG.crops[x]) e.push('菜谱 ' + id + ' 用了不存在的作物 ' + x); });
+    ks(r.supplies).forEach(function(x){ if (!CATALOG.supplies[x]) e.push('菜谱 ' + id + ' 用了不存在的调料 ' + x); });
+    (r.utensils || []).forEach(function(x){ if (!CATALOG.utensils[x]) e.push('菜谱 ' + id + ' 用了不存在的厨具 ' + x); }); });
+  return e;
+}
+var G = {
+  buy: function(itemId){ var p = me(), item;
+    ks(CATALOG.crops).forEach(function(k){ var c = CATALOG.crops[k]; if ('seed_' + k === itemId) item = { type: 'seed', ref: k, price: c.seed_price, name: c.name + '种子' }; });
+    if (!item && CATALOG.supplies[itemId]) item = { type: 'supply', ref: itemId, price: CATALOG.supplies[itemId].price, name: CATALOG.supplies[itemId].name };
+    if (!item && (CATALOG.drinks || {})[itemId]) item = { type: 'drink', ref: itemId, price: CATALOG.drinks[itemId].price, name: CATALOG.drinks[itemId].name };
+    if (!item && CATALOG.utensils[itemId]) item = { type: 'utensil', ref: itemId, price: CATALOG.utensils[itemId].price, name: CATALOG.utensils[itemId].name };
+    if (!item) return done(res(false, '货架上没有这个'));
+    if (item.type === 'utensil' && p.utensils.indexOf(item.ref) >= 0) return done(res(false, '已经有' + item.name + '了'));
+    if (p.coins < item.price) return done(res(false, '金币不够'));
+    p.coins -= item.price;
+    if (item.type === 'seed') p.seeds[item.ref] = (p.seeds[item.ref] || 0) + 1;
+    if (item.type === 'supply') p.pantry[item.ref] = (p.pantry[item.ref] || 0) + (CATALOG.supplies[item.ref].portions || 1);
+    if (item.type === 'drink') p.drinks[item.ref] = (p.drinks[item.ref] || 0) + (CATALOG.drinks[item.ref].amount || 1);
+    if (item.type === 'utensil') p.utensils.push(item.ref);
+    // 每次购买都开一张小票（我们自己家踩过：有的购买路径忘了开票，后来补上的）
+    state.receipts = state.receipts || []; state.receipts.push({ day: state.meta.day, who: p.name, item: item.name, price: item.price, balance: p.coins }); state.receipts = state.receipts.slice(-100);
+    log(p.name, '买了 ' + item.name); return done(res(true, '买下 ' + item.name + '，花了 ' + item.price + ' 金')); },
+  plant: function(plotId){ var p = me(), pl = state.plots.find(function(x){ return String(x.id) === String(plotId); }), c = CATALOG.crops[picked];
+    if (!picked) return done(res(false, '先在下面选一样种子'));
+    if (!pl || pl.item) return done(res(false, '这块地种不了'));
+    if (c.season !== seasonOf(state.meta.day)) return done(res(false, '现在不是' + c.name + '的季节'));
+    if ((p.seeds[picked] || 0) < 1) return done(res(false, '没有这种种子了'));
+    p.seeds[picked]--; pl.item = picked; pl.planted_day = state.meta.day; pl.by = p.id; log(p.name, '种下 ' + c.name); return done(res(true, '种下了 ' + c.name)); },
+  harvest: function(plotId){ var pl = state.plots.find(function(x){ return String(x.id) === String(plotId); });
+    if (!pl || !pl.item) return done(res(false, '地是空的'));
+    var c = CATALOG.crops[pl.item], age = state.meta.day - pl.planted_day;
+    if (age < c.grow_days) return done(res(false, '还要 ' + (c.grow_days - age) + ' 天'));
+    var p = player(pl.by) || me(); add(p.storage, pl.item, 1); log(p.name, '收了 ' + c.name);
+    pl.item = null; pl.planted_day = null; pl.by = null; return done(res(true, '收获 ' + c.name)); },
+  sell: function(cropId){ var p = me(), c = CATALOG.crops[cropId];
+    if (!c || count(p.storage, cropId) < 1) return done(res(false, '仓库里没有'));
+    add(p.storage, cropId, -1); p.coins += c.value; log(p.name, '卖了 ' + c.name); return done(res(true, '卖了 ' + c.value + ' 金')); },
+  cook: function(recipeId){ var p = me(), r = CATALOG.recipes[recipeId], k;
+    for (k of ks(r.crops)) if (count(p.storage, k) < r.crops[k]) return done(res(false, '作物不够'));
+    for (k of ks(r.supplies)) if ((p.pantry[k] || 0) < r.supplies[k]) return done(res(false, '调料不够'));
+    for (k of (r.utensils || [])) if (p.utensils.indexOf(k) < 0) return done(res(false, '缺厨具'));
+    ks(r.crops).forEach(function(x){ add(p.storage, x, -r.crops[x]); }); ks(r.supplies).forEach(function(x){ p.pantry[x] -= r.supplies[x]; });
+    add(p.dishes, recipeId, 1); log(p.name, '做了 ' + r.name); return done(res(true, '做好了 ' + r.name)); },
+  advance: function(n){ state.meta.day += n; return done(res(true, '过了 ' + n + ' 天')); }
+};
+function me(){ return state.players[0]; }
+function done(r){ save(); toast(r.message); render(); return r; }
+function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 1800); }
+function cropName(id){ return (CATALOG.crops[id] || {}).name || id; }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var picked = null;
+
+/* ===== 界面 ===== */
+function render(){
+  var m = CATALOG.meta, p = me(), cur = seasonOf(state.meta.day);
+  document.getElementById('title').textContent = m.title || 'slowgarden';
+  document.getElementById('barDay').textContent = '第 ' + state.meta.day + ' 天';
+  document.getElementById('barSeason').textContent = (m.season_names || {})[cur] + '季';
+  document.getElementById('barCoins').textContent = state.players.map(function(x){ return x.name + ' ' + x.coins + ' 金'; }).join(' · ');
+  var v = validate(); document.getElementById('warnBox').innerHTML = v.length ? '<div class="warn">规则有问题：' + v.map(esc).join('；') + '</div>' : '';
+  document.getElementById('plots').innerHTML = state.plots.map(function(pl){
+    if (!pl.item) return '<div class="plot" onclick="G.plant(' + JSON.stringify(pl.id) + ')"><small>#' + pl.id + '</small><strong>空地</strong><small>点这里种</small></div>';
+    var c = CATALOG.crops[pl.item] || {}, age = state.meta.day - pl.planted_day, ok = age >= (c.grow_days || 1);
+    return '<div class="plot' + (ok ? ' ready' : '') + '" onclick="G.harvest(' + JSON.stringify(pl.id) + ')"><small>#' + pl.id + '</small><strong>' + esc(c.name) + '</strong><small>' + (ok ? '可以收了' : age + '/' + c.grow_days + ' 天') + '</small></div>'; }).join('');
+  var seeds = ks(p.seeds).filter(function(k){ return p.seeds[k] > 0; });
+  document.getElementById('seedPick').innerHTML = '<div class="meta">选一样种子，再点上面的空地：</div>' + (seeds.length ? seeds.map(function(k){ return '<span class="seedbtn' + (picked === k ? ' on' : '') + '" onclick="picked=' + esc(JSON.stringify(k)) + ';render()">' + esc(cropName(k)) + ' ×' + p.seeds[k] + '</span>'; }).join('') : '<div class="empty">种子袋空了，去商店买点吧</div>');
+  var rows = [];
+  ks(CATALOG.crops).forEach(function(k){ var c = CATALOG.crops[k]; if (typeof c.seed_price === 'number') rows.push({ id: 'seed_' + k, name: c.name + '种子', meta: (m.season_names || {})[c.season] + '季 · ' + c.grow_days + ' 天 · 卖 ' + c.value + ' 金' + (c.season !== cur ? ' · 不在季' : ''), price: c.seed_price }); });
+  ks(CATALOG.supplies).forEach(function(k){ var s = CATALOG.supplies[k]; rows.push({ id: k, name: s.name, meta: '调料 · 一份 ' + s.portions + ' 次', price: s.price }); });
+  ks(CATALOG.drinks).forEach(function(k){ var d = CATALOG.drinks[k]; rows.push({ id: k, name: d.name, meta: '饮料 · ' + d.amount + ' 瓶', price: d.price }); });
+  ks(CATALOG.utensils).forEach(function(k){ var u = CATALOG.utensils[k]; rows.push({ id: k, name: u.name, meta: '厨具', price: u.price }); });
+  document.getElementById('shopList').innerHTML = '<div class="card">' + rows.map(function(r){ return '<div class="row"><div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + esc(r.meta) + '</div></div><span class="meta">' + r.price + ' 金</span><button class="act" onclick="G.buy(' + esc(JSON.stringify(r.id)) + ')">买</button></div>'; }).join('') + '</div>';
+  var rc = (state.receipts || []).slice().reverse().slice(0, 10);
+  document.getElementById('receiptBox').innerHTML = rc.length ? rc.map(function(r){ return '<div class="row"><div class="info"><div class="name">' + esc(r.item) + '</div><div class="meta">第 ' + r.day + ' 天 · ' + esc(r.who) + ' · 剩 ' + r.balance + ' 金</div></div><span class="meta">-' + r.price + '</span></div>'; }).join('') : '<div class="empty">还没买过东西</div>';
+  document.getElementById('recipeList').innerHTML = '<div class="card">' + ks(CATALOG.recipes).map(function(k){ var r = CATALOG.recipes[k];
+    var need = [].concat(ks(r.crops).map(function(x){ return cropName(x) + '×' + r.crops[x]; }), ks(r.supplies).map(function(x){ return (CATALOG.supplies[x] || {}).name + '×' + r.supplies[x]; }), (r.utensils || []).map(function(x){ return (CATALOG.utensils[x] || {}).name; })).join('、');
+    return '<div class="row"><div class="info"><div class="name">' + esc(r.name) + '</div><div class="meta">' + esc(need) + '</div></div><button class="act" onclick="G.cook(' + esc(JSON.stringify(k)) + ')">做</button></div>'; }).join('') + '</div>';
+  var st = p.storage || [];
+  document.getElementById('storageBox').innerHTML = st.length ? st.map(function(x){ return '<div class="row"><div class="info"><div class="name">' + esc(cropName(x.item)) + '</div><div class="meta">×' + x.count + ' · 一个卖 ' + ((CATALOG.crops[x.item] || {}).value || 0) + ' 金</div></div><button class="act ghost" onclick="G.sell(' + esc(JSON.stringify(x.item)) + ')">卖一个</button></div>'; }).join('') : '<div class="empty">仓库空的</div>';
+  function box(o, nm){ var k = ks(o).filter(function(x){ return o[x] > 0; }); return k.length ? k.map(function(x){ return '<div class="row"><div class="name">' + esc(nm(x)) + '</div><span class="meta">×' + o[x] + '</span></div>'; }).join('') : '<div class="empty">空</div>'; }
+  document.getElementById('pantryBox').innerHTML = box(p.pantry, function(x){ return (CATALOG.supplies[x] || {}).name || x; });
+  document.getElementById('drinkBox').innerHTML = box(p.drinks, function(x){ return ((CATALOG.drinks || {})[x] || {}).name || x; });
+  document.getElementById('utensilBox').innerHTML = (p.utensils || []).length ? p.utensils.map(function(x){ return '<div class="row"><div class="name">' + esc((CATALOG.utensils[x] || {}).name || x) + '</div></div>'; }).join('') : '<div class="empty">空</div>';
+  document.getElementById('dishBox').innerHTML = (p.dishes || []).length ? p.dishes.map(function(x){ return '<div class="row"><div class="name">' + esc((CATALOG.recipes[x.item] || {}).name || x.item) + '</div><span class="meta">×' + x.count + '</span></div>'; }).join('') : '<div class="empty">还没做菜</div>';
+  renderTogether();
+}
+
+/* ===== 一起：陪伴计时（来自安与霁家里的「一起」房间）。结束时每个玩家都拿金币——两个人一起待着，两个人都有份 ===== */
+var tgWhat = '学习', tgTimer = null;
+function renderTogether(){
+  var a = state.together, go = document.getElementById('tgGo'), lg = state.together_log || [];
+  document.getElementById('tgPick').style.display = a ? 'none' : '';
+  go.textContent = a ? '结束' : '开始';
+  document.getElementById('tgLog').innerHTML = lg.length ? lg.slice().reverse().slice(0, 10).map(function(h){ return '<div class="row"><div class="info"><div class="name">' + esc(h.what) + '</div><div class="meta">' + esc(h.date) + ' · ' + h.minutes + ' 分钟</div></div><span class="meta">每人 +' + h.coins + '</span></div>'; }).join('') : '<div class="empty">还没一起待过。给你的 AI 也看看这一页吧</div>';
+  clearInterval(tgTimer);
+  if (a) { tick(); tgTimer = setInterval(tick, 1000); } else { document.getElementById('tgTime').textContent = String(+document.getElementById('tgMins').value).padStart(2, '0') + ':00'; document.getElementById('tgLabel').textContent = '今天想一起做什么？'; }
+}
+function tick(){ var a = state.together; if (!a) return;
+  var el = (Date.now() - a.start) / 1000, left = a.minutes * 60 - el;
+  document.getElementById('tgLabel').textContent = '一起' + a.what;
+  document.getElementById('tgTime').textContent = left > 0 ? String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(Math.floor(left % 60)).padStart(2, '0') : '时间到';
+  if (left <= 0) stopTogether(); }
+function stopTogether(){ var a = state.together; if (!a) return;
+  var min = Math.floor((Date.now() - a.start) / 60000), coins = Math.floor(min * 10 / 25);
+  state.players.forEach(function(p){ p.coins += coins; });
+  state.together_log = state.together_log || []; state.together_log.push({ what: a.what, minutes: min, coins: coins, date: new Date().toLocaleDateString() });
+  state.together = null; done(res(true, '一起了 ' + min + ' 分钟，每人得 ' + coins + ' 金')); }
+document.getElementById('tgChips').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; tgWhat = b.textContent; document.getElementById('tgNote').value = ''; [].forEach.call(this.children, function(x){ x.classList.toggle('on', x === b); }); });
+document.getElementById('tgMins').onchange = renderTogether;
+document.getElementById('tgGo').onclick = function(){
+  if (state.together) return stopTogether();
+  state.together = { what: (document.getElementById('tgNote').value || '').trim() || tgWhat, minutes: +document.getElementById('tgMins').value, start: Date.now() };
+  save(); renderTogether(); };
+
+/* ===== 存档：导出 / 导入 ===== */
+function exportSave(){ document.getElementById('io').value = JSON.stringify(state, null, 2); toast('已经放进下面的框里，全选复制给 AI 就行'); }
+function importSave(){ try { var s = JSON.parse(document.getElementById('io').value); if (!s.players || !s.plots) throw 0; state = s; done(res(true, '导入好了')); } catch (e) { toast('这段不是 slowgarden 的存档'); } }
+function downloadSave(){ var b = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'slowgarden-state.json'; a.click(); }
+function resetSave(){ if (!confirm('清空存档从头开始？')) return; state = JSON.parse(JSON.stringify(FRESH_STATE)); done(res(true, '重新开始了')); }
+
+document.querySelectorAll('nav button').forEach(function(b){ b.onclick = function(){ var t = b.getAttribute('data-tab');
+  document.querySelectorAll('nav button').forEach(function(x){ x.classList.toggle('on', x === b); });
+  document.querySelectorAll('section').forEach(function(s){ s.classList.toggle('on', s.id === t); }); }; });
+render();
+</script>
+</body>
+</html>
